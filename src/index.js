@@ -1,5 +1,6 @@
 import fs, { promises } from "fs";
 import core from "@actions/core";
+import path from "path";
 import { GitHub, context } from "@actions/github";
 import { parse } from "./lcov";
 import { diff } from "./comment";
