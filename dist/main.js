@@ -22741,11 +22741,11 @@ function parse$2(data) {
 		lib$1(data, function(err, res) {
 			if (err) {
 				reject(err);
-				return
+				return;
 			}
 			resolve(res);
 		});
-	})
+	});
 }
 
 // Get the total coverage percentage from the lcov data.
@@ -22757,7 +22757,7 @@ function percentage(lcov) {
 		found += entry.lines.found;
 	}
 
-	return (hit / found) * 100
+	return (hit / found) * 100;
 }
 
 function tag(name) {
@@ -22771,8 +22771,8 @@ function tag(name) {
 
 		const c = typeof children[0] === "string" ? children : children.slice(1);
 
-		return `<${name}${props}>${c.join("")}</${name}>`
-	}
+		return `<${name}${props}>${c.join("")}</${name}>`;
+	};
 }
 
 const details = tag("details");
@@ -22786,7 +22786,7 @@ const tbody = tag("tbody");
 const a = tag("a");
 
 const fragment = function(...children) {
-	return children.join("")
+	return children.join("");
 };
 
 // Tabulate the lcov data in a HTML table.
@@ -22818,15 +22818,15 @@ function tabulate(lcov, options) {
 			[],
 		);
 
-	return table(tbody(head, ...rows))
+	return table(tbody(head, ...rows));
 }
 
 function toFolder(path) {
 	if (path === "") {
-		return ""
+		return "";
 	}
 
-	return tr(td({ colspan: 5 }, b(path)))
+	return tr(td({ colspan: 5 }, b(path)));
 }
 
 function toRow(file, indent, options) {
@@ -22836,7 +22836,7 @@ function toRow(file, indent, options) {
 		td(percentage$1(file.functions)),
 		td(percentage$1(file.lines)),
 		td(uncovered(file, options)),
-	)
+	);
 }
 
 function filename(file, indent, options) {
@@ -22845,12 +22845,12 @@ function filename(file, indent, options) {
 	const parts = relative.split("/");
 	const last = parts[parts.length - 1];
 	const space = indent ? "&nbsp; &nbsp;" : "";
-	return fragment(space, a({ href }, last))
+	return fragment(space, a({ href }, last));
 }
 
 function percentage$1(item) {
 	if (!item) {
-		return "N/A"
+		return "N/A";
 	}
 
 	const value = item.found === 0 ? 100 : (item.hit / item.found) * 100;
@@ -22858,7 +22858,7 @@ function percentage$1(item) {
 
 	const tag = value === 100 ? fragment : b;
 
-	return tag(`${rounded}%`)
+	return tag(`${rounded}%`);
 }
 
 function uncovered(file, options) {
@@ -22876,46 +22876,124 @@ function uncovered(file, options) {
 		.map(function(line) {
 			const relative = file.file.replace(options.prefix, "");
 			const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
-			return a({ href }, line)
+			return a({ href }, line);
 		})
-		.join(", ")
+		.join(", ");
 }
 
-function comment (lcov, options) {
+function comment(lcov, options) {
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
-	)
+	);
 }
 
 function diff(lcov, before, options) {
 	if (!before) {
-		return comment(lcov, options)
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
 	const pafter = percentage(lcov);
 	const pdiff = pafter - pbefore;
 	const plus = pdiff > 0 ? "+" : "";
-	const arrow =
-		pdiff === 0
-			? ""
-			: pdiff < 0
-				? "▾"
-				: "▴";
+	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		table(tbody(tr(
-			th(pafter.toFixed(2), "%"),
-			th(arrow, " ", plus, pdiff.toFixed(2), "%"),
-		))),
+		table(
+			tbody(
+				tr(
+					th(pafter.toFixed(2), "%"),
+					th(arrow, " ", plus, pdiff.toFixed(2), "%"),
+				),
+			),
+		),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
-	)
+	);
 }
+
+// Not needed for now, but could be useful
+// const createStatus = async ({ client, context, sha, status }) =>
+// 	client.repos.createCommitStatus({
+// 		...context.repo,
+// 		sha,
+// 		...status,
+// 	})
+
+const hiddenHeader = `<!-- monorepo-jest-reporter-action -->`;
+
+const appendHiddenHeaderToComment = body => hiddenHeader + body;
+
+const listComments = async ({ client, context, prNumber, commentHeader }) => {
+	const { data: existingComments } = await client.issues.listComments({
+		...context.repo,
+		issue_number: prNumber,
+	});
+
+	return existingComments.filter(({ body }) => body.startsWith(hiddenHeader));
+};
+
+const insertComment = async ({ client, context, prNumber, body }) =>
+	client.issues.createComment({
+		...context.repo,
+		issue_number: prNumber,
+		body: appendHiddenHeaderToComment(body),
+	});
+
+const updateComment = async ({ client, context, body, commentId }) =>
+	client.issues.updateComment({
+		...context.repo,
+		comment_id: commentId,
+		body: appendHiddenHeaderToComment(body),
+	});
+
+const deleteComments = async ({ client, context, comments }) =>
+	Promise.all(
+		comments.map(({ id }) =>
+			client.issues.deleteComment({
+				...context.repo,
+				comment_id: id,
+			}),
+		),
+	);
+
+const upsertComment = async ({ client, context, prNumber, body }) => {
+	const existingComments = await listComments({
+		client,
+		context,
+		prNumber,
+	});
+	const last = existingComments.pop();
+
+	await deleteComments({
+		client,
+		context,
+		comments: existingComments,
+	});
+
+	return last
+		? updateComment({
+				client,
+				context,
+				body,
+				commentId: last.id,
+		  })
+		: insertComment({
+				client,
+				context,
+				prNumber,
+				body,
+		  });
+};
+
+var github$1 = {
+	upsertComment,
+};
+var github_1$1 = github$1.upsertComment;
 
 async function main$1() {
 	const token = core$1.getInput("github-token");
@@ -22925,10 +23003,11 @@ async function main$1() {
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
-		return
+		return;
 	}
 
-	const baseRaw = baseFile && await fs.promises.readFile(baseFile, "utf-8").catch(err => null);
+	const baseRaw =
+		baseFile && (await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
 	if (baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
@@ -22942,13 +23021,14 @@ async function main$1() {
 	};
 
 	const lcov = await parse$2(raw);
-	const baselcov = baseRaw && await parse$2(baseRaw);
-	const body = diff(lcov, baselcov, options);
+	const baselcov = baseRaw && (await parse$2(baseRaw));
 
-	await new github_2(token).issues.createComment({
-		repo: github_1.repo.repo,
-		owner: github_1.repo.owner,
-		issue_number: github_1.payload.pull_request.number,
+	const githubClient = github_2.getOctokit(githubToken);
+
+	await github_1$1({
+		githubClient,
+		context: github_1,
+		prNumber: github_1.payload.pull_request.number,
 		body: diff(lcov, baselcov, options),
 	});
 }
