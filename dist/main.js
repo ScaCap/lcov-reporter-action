@@ -22924,10 +22924,12 @@ async function main$1() {
 	// Add base path for monorepo
 	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
 
-	const dir = await fs.promises.opendir(monorepoBasePath);
-	for await (const dirent of dir) {
-    console.log(dirent.name);
+	let dirCont = await fs.promises.readdir(monorepoBasePath);
+	let files = dirCont.filter( function( elm ) {return elm.match(/.*\.(info)/ig);});
+  for (const file of files) {
+    console.log(file);
   }
+
 
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);

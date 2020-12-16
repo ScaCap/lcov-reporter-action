@@ -13,10 +13,12 @@ async function main() {
 	// Add base path for monorepo
 	const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
 
-	const dir = await fs.opendir(monorepoBasePath);
-	for await (const dirent of dir) {
-    console.log(dirent.name);
+	let dirCont = await fs.readdir(monorepoBasePath);
+	let files = dirCont.filter( function( elm ) {return elm.match(/.*\.(info)/ig);});
+  for (const file of files) {
+    console.log(file);
   }
+
 
 
 	const raw = await fs.readFile(lcovFile, "utf-8").catch(err => null)
