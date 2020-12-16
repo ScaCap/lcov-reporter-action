@@ -22922,6 +22922,14 @@ async function main$1() {
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core$1.getInput("lcov-base");
 
+	// Add base path for monorepo
+	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
+
+	for await (const dirent of monorepoBasePath) {
+    console.log(dirent.name);
+  }
+
+
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
