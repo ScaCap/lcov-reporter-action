@@ -1,3 +1,5 @@
+// Modified from: https://github.com/slavcodev/coverage-monitor-action
+
 // Not needed for now, but could be useful
 // const createStatus = async ({ client, context, sha, status }) =>
 // 	client.repos.createCommitStatus({
@@ -6,6 +8,9 @@
 // 		...status,
 // 	})
 
+// Every comment written by our action will have this hidden
+// header on top, and will be used to identify which comments
+// to update/delete etc
 const hiddenHeader = `<!-- monorepo-jest-reporter-action -->`;
 
 const appendHiddenHeaderToComment = body => hiddenHeader + body;
