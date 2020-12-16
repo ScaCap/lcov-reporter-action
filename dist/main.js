@@ -22881,7 +22881,8 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcov, options) {
+function comment(lcov, lcovArrayWithRaw, options) {
+	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
@@ -22890,9 +22891,9 @@ function comment(lcov, options) {
 	);
 }
 
-function diff(lcov, before, options) {
+function diff(lcov, lcovArrayWithRaw, before, options) {
 	if (!before) {
-		return comment(lcov, options);
+		return comment(lcov, lcovArrayWithRaw, options);
 	}
 
 	const pbefore = percentage(before);
@@ -22965,8 +22966,6 @@ async function main$1() {
 		}
 	}
 
-	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
-
 	const options = {
 		repository: github_1.payload.repository.full_name,
 		commit: github_1.payload.pull_request.head.sha,
@@ -22983,7 +22982,7 @@ async function main$1() {
 		repo: github_1.repo.repo,
 		owner: github_1.repo.owner,
 		issue_number: github_1.payload.pull_request.number,
-		body: diff(lcov, baselcov, options),
+		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
 	});
 }
 

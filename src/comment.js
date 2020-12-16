@@ -3,7 +3,8 @@ import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
-export function comment(lcov, options) {
+export function comment(lcov, lcovArrayWithRaw, options) {
+	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
@@ -12,9 +13,9 @@ export function comment(lcov, options) {
 	);
 }
 
-export function diff(lcov, before, options) {
+export function diff(lcov, lcovArrayWithRaw, before, options) {
 	if (!before) {
-		return comment(lcov, options);
+		return comment(lcov, lcovArrayWithRaw, options);
 	}
 
 	const pbefore = percentage(before);

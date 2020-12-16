@@ -54,8 +54,6 @@ async function main() {
 		}
 	}
 
-	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
-
 	const options = {
 		repository: context.payload.repository.full_name,
 		commit: context.payload.pull_request.head.sha,
@@ -72,7 +70,7 @@ async function main() {
 		repo: context.repo.repo,
 		owner: context.repo.owner,
 		issue_number: context.payload.pull_request.number,
-		body: diff(lcov, baselcov, options),
+		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
 	});
 }
 
