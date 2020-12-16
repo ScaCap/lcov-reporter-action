@@ -15,7 +15,7 @@ export function comment(lcov, lcovArrayWithRaw, options) {
 		)} \n\n ${details(
 			summary("Coverage Report"),
 			tabulate(lcovObj.lcov, options),
-		)}`;
+		)} <br/>`;
 	});
 
 	return fragment(
