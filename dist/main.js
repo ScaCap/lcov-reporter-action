@@ -6051,10 +6051,10 @@ async function main() {
 	const lcov = await parse$1(raw);
 	const baselcov = baseRaw && (await parse$1(baseRaw));
 
-	const githubClient = github$1.getOctokit(token);
+	const client = github$1.getOctokit(token);
 
 	await github_1$1({
-		githubClient,
+		client,
 		context,
 		prNumber: context.payload.pull_request.number,
 		body: diff(lcov, baselcov, options),

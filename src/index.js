@@ -36,10 +36,10 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 
-	const githubClient = github.getOctokit(token);
+	const client = github.getOctokit(token);
 
 	await upsertComment({
-		githubClient,
+		client,
 		context,
 		prNumber: context.payload.pull_request.number,
 		body: diff(lcov, baselcov, options),
