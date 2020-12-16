@@ -6,22 +6,21 @@ import { GitHub, context } from "@actions/github";
 import { parse } from "./lcov";
 import { diff } from "./comment";
 
-const getAllFiles = function(dirPath, arrayOfFiles) {
-  let files = fs.readdirSync(dirPath)
-  arrayOfFiles = arrayOfFiles || []
-
-  files.forEach(function(file) {
-    if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles)
-    } else {
-      if( file.includes('.info')){
-        arrayOfFiles.push(path.join(path.resolve(), dirPath, "/", file))
-      }
-    }
-  })
-
-  return arrayOfFiles
-}
+const walkSync = (dir, filelist = []) => {
+	fs.readdirSync(dir).forEach(file => {
+		filelist = fs.statSync(path.join(dir, file)).isDirectory()
+			? walkSync(path.join(dir, file), filelist)
+			: filelist
+					.filter(file => {
+						return file.path.includes("lcov.info");
+					})
+					.concat({
+						name: dir.split("/")[1],
+						path: path.join(dir, file),
+					});
+	});
+	return filelist;
+};
 
 async function main() {
 	const token = core.getInput("github-token");
@@ -31,15 +30,22 @@ async function main() {
 	// Add base path for monorepo
 	const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
 
-	const lcovArray = getAllFiles(monorepoBasePath);
+	let lcovArray = walkSync(monorepoBasePath);
 
-	let raw = "";
-	lcovArray.forEach(function(lcovFile) {
-		raw += fs.readFileSync(lcovFile, "utf-8")
-	});
+	const lcovArrayWithRaw = [];
 
+	for (const file of lcovArray) {
+		if (file.path.includes(".info")) {
+			const raw = await promises.readFile(file.path, "utf8");
+			const data = await parse(raw);
+			lcovArrayWithRaw.push({
+				packageName: file.name,
+				lcov: data,
+			});
+		}
+	}
 
-	//const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null)
+	const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
 		return;
@@ -67,7 +73,7 @@ async function main() {
 		repo: context.repo.repo,
 		owner: context.repo.owner,
 		issue_number: context.payload.pull_request.number,
-		body: diff(lcov, baselcov, options),
+		body: diff(lcovArrayWithRaw, lcov, baselcov, options),
 	});
 }
 

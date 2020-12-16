@@ -22881,18 +22881,24 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcov, options) {
+function comment(lcovArrayWithRaw, lcov, options) {
+	const tableHTML = lcovArrayWithRaw.map(lcovObj => {
+		return `${lcovObj.packageName} - ${table(
+			tbody(tr(th(percentage(lcovObj.lcov).toFixed(2), "%"))),
+		)} \n\n`;
+	});
+
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
+		tableHTML.join(""),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
 }
 
-function diff(lcov, before, options) {
+function diff(lcovArrayWithRaw, lcov, before, options) {
 	if (!before) {
-		return comment(lcov, options);
+		return comment(lcovArrayWithRaw, lcov, options);
 	}
 
 	const pbefore = percentage(before);
@@ -22916,21 +22922,20 @@ function diff(lcov, before, options) {
 	);
 }
 
-const getAllFiles = function(dirPath, arrayOfFiles) {
-  let files = fs__default.readdirSync(dirPath);
-  arrayOfFiles = arrayOfFiles || [];
-
-  files.forEach(function(file) {
-    if (fs__default.statSync(dirPath + "/" + file).isDirectory()) {
-      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
-    } else {
-      if( file.includes('.info')){
-        arrayOfFiles.push(path.join(path.resolve(), dirPath, "/", file));
-      }
-    }
-  });
-
-  return arrayOfFiles
+const walkSync = (dir, filelist = []) => {
+	fs__default.readdirSync(dir).forEach(file => {
+		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
+			? walkSync(path.join(dir, file), filelist)
+			: filelist
+					.filter(file => {
+						return file.path.includes("lcov.info");
+					})
+					.concat({
+						name: dir.split("/")[1],
+						path: path.join(dir, file),
+					});
+	});
+	return filelist;
 };
 
 async function main$1() {
@@ -22941,15 +22946,22 @@ async function main$1() {
 	// Add base path for monorepo
 	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
 
-	const lcovArray = getAllFiles(monorepoBasePath);
+	let lcovArray = walkSync(monorepoBasePath);
 
-	let raw = "";
-	lcovArray.forEach(function(lcovFile) {
-		raw += fs__default.readFileSync(lcovFile, "utf-8");
-	});
+	const lcovArrayWithRaw = [];
 
+	for (const file of lcovArray) {
+		if (file.path.includes(".info")) {
+			const raw = await fs.promises.readFile(file.path, "utf8");
+			const data = await parse$2(raw);
+			lcovArrayWithRaw.push({
+				packageName: file.name,
+				lcov: data,
+			});
+		}
+	}
 
-	//const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null)
+	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
 		return;
@@ -22977,7 +22989,7 @@ async function main$1() {
 		repo: github_1.repo.repo,
 		owner: github_1.repo.owner,
 		issue_number: github_1.payload.pull_request.number,
-		body: diff(lcov, baselcov, options),
+		body: diff(lcovArrayWithRaw, lcov, baselcov, options),
 	});
 }
 
