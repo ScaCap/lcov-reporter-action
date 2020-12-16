@@ -5,8 +5,13 @@ import { tabulate } from "./tabulate";
 
 export function comment(lcov, lcovArrayWithRaw, options) {
 	const HTML = lcovArrayWithRaw.map(lcovObj => {
-		return `${lcovObj.packageName} - ${table(
-			tbody(tr(th(percentage(lcovObj.lcov).toFixed(2), "%"))),
+		return `${table(
+			tbody(
+				tr(
+					th(lcovObj.packageName),
+					th(percentage(lcovObj.lcov).toFixed(2), "%"),
+				),
+			),
 		)} \n\n ${details(
 			summary("Coverage Report"),
 			tabulate(lcovObj.lcov, options),
