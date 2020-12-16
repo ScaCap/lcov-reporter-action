@@ -5,7 +5,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
 var os = _interopDefault(require('os'));
-var path = _interopDefault(require('path'));
+var path$1 = _interopDefault(require('path'));
 var child_process = _interopDefault(require('child_process'));
 var Stream = _interopDefault(require('stream'));
 var assert = _interopDefault(require('assert'));
@@ -157,7 +157,7 @@ exports.setSecret = setSecret;
  */
 function addPath(inputPath) {
     command.issueCommand('add-path', {}, inputPath);
-    process.env['PATH'] = `${inputPath}${path.delimiter}${process.env['PATH']}`;
+    process.env['PATH'] = `${inputPath}${path$1.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
 /**
@@ -622,7 +622,7 @@ function which (cmd, opt, cb) {
     if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
       pathPart = pathPart.slice(1, -1);
 
-    var p = path.join(pathPart, cmd);
+    var p = path$1.join(pathPart, cmd);
     if (!pathPart && (/^\.[\\\/]/).test(cmd)) {
       p = cmd.slice(0, 2) + p;
     }
@@ -656,7 +656,7 @@ function whichSync (cmd, opt) {
     if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
       pathPart = pathPart.slice(1, -1);
 
-    var p = path.join(pathPart, cmd);
+    var p = path$1.join(pathPart, cmd);
     if (!pathPart && /^\.[\\\/]/.test(cmd)) {
       p = cmd.slice(0, 2) + p;
     }
@@ -718,7 +718,7 @@ function resolveCommandAttempt(parsed, withoutPathExt) {
     try {
         resolved = which_1.sync(parsed.command, {
             path: (parsed.options.env || process.env)[pathKey$1],
-            pathExt: withoutPathExt ? path.delimiter : undefined,
+            pathExt: withoutPathExt ? path$1.delimiter : undefined,
         });
     } catch (e) {
         /* Empty */
@@ -729,7 +729,7 @@ function resolveCommandAttempt(parsed, withoutPathExt) {
     // If we successfully resolved, ensure that an absolute path is returned
     // Note that when a custom `cwd` was used, we need to resolve to an absolute path based on it
     if (resolved) {
-        resolved = path.resolve(hasCustomCwd ? parsed.options.cwd : '', resolved);
+        resolved = path$1.resolve(hasCustomCwd ? parsed.options.cwd : '', resolved);
     }
 
     return resolved;
@@ -2407,7 +2407,7 @@ function parseNonShell(parsed) {
 
         // Normalize posix paths into OS compatible paths (e.g.: foo/bar -> foo\bar)
         // This is necessary otherwise it will always fail with ENOENT in those cases
-        parsed.command = path.normalize(parsed.command);
+        parsed.command = path$1.normalize(parsed.command);
 
         // Escape command & arguments
         parsed.command = _escape.command(parsed.command);
@@ -2602,19 +2602,19 @@ module.exports = opts => {
 	}, opts);
 
 	let prev;
-	let pth = path.resolve(opts.cwd);
+	let pth = path$1.resolve(opts.cwd);
 	const ret = [];
 
 	while (prev !== pth) {
-		ret.push(path.join(pth, 'node_modules/.bin'));
+		ret.push(path$1.join(pth, 'node_modules/.bin'));
 		prev = pth;
-		pth = path.resolve(pth, '..');
+		pth = path$1.resolve(pth, '..');
 	}
 
 	// ensure the running `node` binary is used
-	ret.push(path.dirname(process.execPath));
+	ret.push(path$1.dirname(process.execPath));
 
-	return ret.concat(opts.path).join(path.delimiter);
+	return ret.concat(opts.path).join(path$1.delimiter);
 };
 
 module.exports.env = opts => {
@@ -3387,7 +3387,7 @@ function handleArgs(cmd, args, opts) {
 		opts.cleanup = false;
 	}
 
-	if (process.platform === 'win32' && path.basename(parsed.command) === 'cmd.exe') {
+	if (process.platform === 'win32' && path$1.basename(parsed.command) === 'cmd.exe') {
 		// #116
 		parsed.args.unshift('/q');
 	}
@@ -22617,7 +22617,7 @@ http://yuilibrary.com/license/
 
 
 /* istanbul ignore next */
-var exists = fs__default.exists || path.exists;
+var exists = fs__default.exists || path$1.exists;
 
 var walkFile = function(str, cb) {
     var data = [], item;
@@ -22916,6 +22916,22 @@ function diff(lcov, before, options) {
 	);
 }
 
+const walkSync = (dir, filelist = []) => {
+	fs__default.readdirSync(dir).forEach(file => {
+		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
+			? walkSync(path.join(dir, file), filelist)
+			: filelist
+					.filter(file => {
+						return file.path.includes("lcov.info");
+					})
+					.concat({
+						name: dir.split("/")[1],
+						path: path.join(dir, file),
+					});
+	});
+	return filelist;
+};
+
 async function main$1() {
 	const token = core$1.getInput("github-token");
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
@@ -22932,6 +22948,24 @@ async function main$1() {
 	if (baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
+
+	// Add base path for monorepo
+	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
+	let lcovArray = walkSync(monorepoBasePath);
+
+	const lcovArrayWithRaw = [];
+	for (const file of lcovArray) {
+		if (file.path.includes(".info")) {
+			const raw = await fs.promises.readFile(file.path, "utf8");
+			const data = await parse$2(raw);
+			lcovArrayWithRaw.push({
+				packageName: file.name,
+				lcov: data,
+			});
+		}
+	}
+
+	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
 
 	const options = {
 		repository: github_1.payload.repository.full_name,
