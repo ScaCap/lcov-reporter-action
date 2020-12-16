@@ -22924,7 +22924,7 @@ async function main$1() {
 	// Add base path for monorepo
 	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
 
-	const dir = await fs.promises.promises.opendir(monorepoBasePath);
+	const dir = await fs.promises.opendir(monorepoBasePath);
 	for await (const dirent of dir) {
     console.log(dirent.name);
   }
