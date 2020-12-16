@@ -23023,7 +23023,7 @@ async function main$1() {
 	const lcov = await parse$2(raw);
 	const baselcov = baseRaw && (await parse$2(baseRaw));
 
-	const githubClient = github_2.getOctokit(githubToken);
+	const githubClient = github_2.getOctokit(token);
 
 	await github_1$1({
 		githubClient,

@@ -34,7 +34,7 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 
-	const githubClient = GitHub.getOctokit(githubToken);
+	const githubClient = GitHub.getOctokit(token);
 
 	await upsertComment({
 		githubClient,
