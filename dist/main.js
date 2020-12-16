@@ -22881,7 +22881,8 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcov, options) {
+function comment(lcov, lcovArrayWithRaw, options) {
+	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
@@ -22892,8 +22893,7 @@ function comment(lcov, options) {
 
 function diff(lcov, lcovArrayWithRaw, before, options) {
 	if (!before) {
-		console.log("lcovArrayWithRaw", lcovArrayWithRaw);
-		return comment(lcov, options);
+		return comment(lcov, lcovArrayWithRaw, options);
 	}
 
 	const pbefore = percentage(before);
@@ -22976,7 +22976,6 @@ async function main$1() {
 
 	const lcov = await parse$2(raw);
 	const baselcov = baseRaw && (await parse$2(baseRaw));
-	const body = diff(lcov, baselcov, options);
 
 	await new github_2(token).issues.createComment({
 		repo: github_1.repo.repo,

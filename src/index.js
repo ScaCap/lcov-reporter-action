@@ -64,7 +64,6 @@ async function main() {
 
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
-	const body = diff(lcov, baselcov, options);
 
 	await new GitHub(token).issues.createComment({
 		repo: context.repo.repo,
