@@ -1,7 +1,7 @@
-import { details, summary, b, fragment, table, tbody, tr, th } from "./html"
+import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 
-import { percentage } from "./lcov"
-import { tabulate } from "./tabulate"
+import { percentage } from "./lcov";
+import { tabulate } from "./tabulate";
 
 export function comment(lcov, options) {
 	return fragment(
@@ -9,19 +9,19 @@ export function comment(lcov, options) {
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
-	)
+	);
 }
 
 export function diff(lcov, before, options) {
 	if (!before) {
-		return comment(lcov, options)
+		return comment(lcov, options);
 	}
 
-	const pbefore = percentage(before)
-	const pafter = percentage(lcov)
-	const pdiff = pafter - pbefore
-	const plus = pdiff > 0 ? "+" : ""
-	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴"
+	const pbefore = percentage(before);
+	const pafter = percentage(lcov);
+	const pdiff = pafter - pbefore;
+	const plus = pdiff > 0 ? "+" : "";
+	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
@@ -35,5 +35,5 @@ export function diff(lcov, before, options) {
 		),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
-	)
+	);
 }

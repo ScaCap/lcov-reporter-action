@@ -1,5 +1,5 @@
-import { tabulate } from "./tabulate"
-import { th, tr, td, table, tbody, a, b, span, fragment } from "./html"
+import { tabulate } from "./tabulate";
+import { th, tr, td, table, tbody, a, b, span, fragment } from "./html";
 
 test("tabulate should generate a correct table", function() {
 	const data = [
@@ -113,13 +113,13 @@ test("tabulate should generate a correct table", function() {
 				],
 			},
 		},
-	]
+	];
 
 	const options = {
 		repository: "example/foo",
 		commit: "2e15bee6fe0df5003389aa5ec894ec0fea2d874a",
 		prefix: "/files/project/",
-	}
+	};
 
 	const html = table(
 		tbody(
@@ -198,6 +198,6 @@ test("tabulate should generate a correct table", function() {
 				),
 			),
 		),
-	)
-	expect(tabulate(data, options)).toBe(html)
-})
+	);
+	expect(tabulate(data, options)).toBe(html);
+});
