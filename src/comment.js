@@ -4,21 +4,18 @@ import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
 export function comment(lcov, lcovArrayWithRaw, options) {
-	const tableHTML = lcovArrayWithRaw.map(lcovObj => {
+	const HTML = lcovArrayWithRaw.map(lcovObj => {
 		return `${lcovObj.packageName} - ${table(
 			tbody(tr(th(percentage(lcovObj.lcov).toFixed(2), "%"))),
-		)} \n\n`;
-	});
-
-	const detailsHTML = lcovArrayWithRaw.map(lcovObj => {
-		return details(summary("Coverage Report"), tabulate(lcovObj.lcov, options));
+		)} \n\n ${details(
+			summary("Coverage Report"),
+			tabulate(lcovObj.lcov, options),
+		)}`;
 	});
 
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		tableHTML.join(""),
-		"\n\n",
-		detailsHTML.join(""),
+		HTML.join(""),
 	);
 }
 
