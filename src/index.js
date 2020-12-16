@@ -4,6 +4,7 @@ import { GitHub, context } from "@actions/github";
 
 import { parse } from "./lcov";
 import { diff } from "./comment";
+import { upsertComment } from "./github";
 
 async function main() {
 	const token = core.getInput("github-token");
