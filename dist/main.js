@@ -22892,7 +22892,6 @@ function comment(lcovArrayWithRaw, lcov, options) {
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		tableHTML.join(""),
 		"\n\n",
-		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
 }
 
