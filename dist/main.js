@@ -4,8 +4,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
-var path = _interopDefault(require('path'));
 var os = _interopDefault(require('os'));
+var path = _interopDefault(require('path'));
 var child_process = _interopDefault(require('child_process'));
 var Stream = _interopDefault(require('stream'));
 var assert = _interopDefault(require('assert'));
@@ -22881,23 +22881,18 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcovArrayWithRaw, lcov, options) {
-	const tableHTML = lcovArrayWithRaw.map(lcovObj => {
-		return `${lcovObj.packageName} - ${table(
-			tbody(tr(th(percentage(lcovObj.lcov).toFixed(2), "%"))),
-		)} \n\n`;
-	});
-
+function comment(lcov, options) {
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		tableHTML.join(""),
+		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
 		"\n\n",
+		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
 }
 
-function diff(lcovArrayWithRaw, lcov, before, options) {
+function diff(lcov, before, options) {
 	if (!before) {
-		return comment(lcovArrayWithRaw, lcov, options);
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
@@ -22921,44 +22916,10 @@ function diff(lcovArrayWithRaw, lcov, before, options) {
 	);
 }
 
-const walkSync = (dir, filelist = []) => {
-	fs__default.readdirSync(dir).forEach(file => {
-		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
-			? walkSync(path.join(dir, file), filelist)
-			: filelist
-					.filter(file => {
-						return file.path.includes("lcov.info");
-					})
-					.concat({
-						name: dir.split("/")[1],
-						path: path.join(dir, file),
-					});
-	});
-	return filelist;
-};
-
 async function main$1() {
 	const token = core$1.getInput("github-token");
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core$1.getInput("lcov-base");
-
-	// Add base path for monorepo
-	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
-
-	let lcovArray = walkSync(monorepoBasePath);
-
-	const lcovArrayWithRaw = [];
-
-	for (const file of lcovArray) {
-		if (file.path.includes(".info")) {
-			const raw = await fs.promises.readFile(file.path, "utf8");
-			const data = await parse$2(raw);
-			lcovArrayWithRaw.push({
-				packageName: file.name,
-				lcov: data,
-			});
-		}
-	}
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
@@ -22988,7 +22949,7 @@ async function main$1() {
 		repo: github_1.repo.repo,
 		owner: github_1.repo.owner,
 		issue_number: github_1.payload.pull_request.number,
-		body: diff(lcovArrayWithRaw, lcov, baselcov, options),
+		body: diff(lcov, baselcov, options),
 	});
 }
 

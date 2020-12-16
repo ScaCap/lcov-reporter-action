@@ -3,23 +3,18 @@ import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
-export function comment(lcovArrayWithRaw, lcov, options) {
-	const tableHTML = lcovArrayWithRaw.map(lcovObj => {
-		return `${lcovObj.packageName} - ${table(
-			tbody(tr(th(percentage(lcovObj.lcov).toFixed(2), "%"))),
-		)} \n\n`;
-	});
-
+export function comment(lcov, options) {
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		tableHTML.join(""),
+		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
 		"\n\n",
+		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
 }
 
-export function diff(lcovArrayWithRaw, lcov, before, options) {
+export function diff(lcov, before, options) {
 	if (!before) {
-		return comment(lcovArrayWithRaw, lcov, options);
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
