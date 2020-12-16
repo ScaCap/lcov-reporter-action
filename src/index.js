@@ -1,9 +1,10 @@
 import fs, { promises } from "fs";
 import core from "@actions/core";
+import github from "@actions/github";
 import path from "path";
-import { GitHub, context } from "@actions/github";
 import { parse } from "./lcov";
 import { diff } from "./comment";
+import { upsertComment } from "./github";
 
 const walkSync = (dir, filelist = []) => {
 	fs.readdirSync(dir).forEach(file => {
@@ -22,6 +23,8 @@ const walkSync = (dir, filelist = []) => {
 };
 
 async function main() {
+	const { context = {} } = github || {};
+
 	const token = core.getInput("github-token");
 	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core.getInput("lcov-base");
@@ -65,11 +68,13 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 
-	await new GitHub(token).issues.createComment({
-		repo: context.repo.repo,
-		owner: context.repo.owner,
-		issue_number: context.payload.pull_request.number,
-		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
+	const client = github.getOctokit(token);
+
+	await upsertComment({
+		client,
+		context,
+		prNumber: context.payload.pull_request.number,
+		body: diff(lcov, baselcov, options),
 	});
 }
 

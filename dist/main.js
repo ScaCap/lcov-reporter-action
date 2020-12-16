@@ -22604,7 +22604,7 @@ exports.GitHub = GitHub;
 
 });
 
-unwrapExports(github);
+var github$1 = unwrapExports(github);
 var github_1 = github.context;
 var github_2 = github.GitHub;
 
@@ -22928,6 +22928,90 @@ function diff(lcov, lcovArrayWithRaw, before, options) {
 	);
 }
 
+// Modified from: https://github.com/slavcodev/coverage-monitor-action
+
+// Not needed for now, but could be useful
+// const createStatus = async ({ client, context, sha, status }) =>
+// 	client.repos.createCommitStatus({
+// 		...context.repo,
+// 		sha,
+// 		...status,
+// 	})
+
+// Every comment written by our action will have this hidden
+// header on top, and will be used to identify which comments
+// to update/delete etc
+const hiddenHeader = `<!-- monorepo-jest-reporter-action -->`;
+
+const appendHiddenHeaderToComment = body => hiddenHeader + body;
+
+const listComments = async ({ client, context, prNumber, commentHeader }) => {
+	const { data: existingComments } = await client.issues.listComments({
+		...context.repo,
+		issue_number: prNumber,
+	});
+
+	return existingComments.filter(({ body }) => body.startsWith(hiddenHeader));
+};
+
+const insertComment = async ({ client, context, prNumber, body }) =>
+	client.issues.createComment({
+		...context.repo,
+		issue_number: prNumber,
+		body: appendHiddenHeaderToComment(body),
+	});
+
+const updateComment = async ({ client, context, body, commentId }) =>
+	client.issues.updateComment({
+		...context.repo,
+		comment_id: commentId,
+		body: appendHiddenHeaderToComment(body),
+	});
+
+const deleteComments = async ({ client, context, comments }) =>
+	Promise.all(
+		comments.map(({ id }) =>
+			client.issues.deleteComment({
+				...context.repo,
+				comment_id: id,
+			}),
+		),
+	);
+
+const upsertComment = async ({ client, context, prNumber, body }) => {
+	const existingComments = await listComments({
+		client,
+		context,
+		prNumber,
+	});
+	const last = existingComments.pop();
+
+	await deleteComments({
+		client,
+		context,
+		comments: existingComments,
+	});
+
+	return last
+		? updateComment({
+				client,
+				context,
+				body,
+				commentId: last.id,
+		  })
+		: insertComment({
+				client,
+				context,
+				prNumber,
+				body,
+		  });
+};
+
+var github$2 = {
+	upsertComment,
+};
+var github_1$1 = github$2.upsertComment;
+
 const walkSync = (dir, filelist = []) => {
 	fs__default.readdirSync(dir).forEach(file => {
 		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
@@ -22945,6 +23029,8 @@ const walkSync = (dir, filelist = []) => {
 };
 
 async function main$1() {
+	const { context = {} } = github$1 || {};
+
 	const token = core$1.getInput("github-token");
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core$1.getInput("lcov-base");
@@ -22978,21 +23064,23 @@ async function main$1() {
 	}
 
 	const options = {
-		repository: github_1.payload.repository.full_name,
-		commit: github_1.payload.pull_request.head.sha,
+		repository: context.payload.repository.full_name,
+		commit: context.payload.pull_request.head.sha,
 		prefix: `${process.env.GITHUB_WORKSPACE}/`,
-		head: github_1.payload.pull_request.head.ref,
-		base: github_1.payload.pull_request.base.ref,
+		head: context.payload.pull_request.head.ref,
+		base: context.payload.pull_request.base.ref,
 	};
 
 	const lcov = await parse$2(raw);
 	const baselcov = baseRaw && (await parse$2(baseRaw));
 
-	await new github_2(token).issues.createComment({
-		repo: github_1.repo.repo,
-		owner: github_1.repo.owner,
-		issue_number: github_1.payload.pull_request.number,
-		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
+	const client = github$1.getOctokit(token);
+
+	await github_1$1({
+		client,
+		context,
+		prNumber: context.payload.pull_request.number,
+		body: diff(lcov, baselcov, options),
 	});
 }
 
