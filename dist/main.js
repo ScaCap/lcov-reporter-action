@@ -4,8 +4,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
-var os = _interopDefault(require('os'));
 var path = _interopDefault(require('path'));
+var os = _interopDefault(require('os'));
 var child_process = _interopDefault(require('child_process'));
 var Stream = _interopDefault(require('stream'));
 var assert = _interopDefault(require('assert'));
@@ -22916,6 +22916,23 @@ function diff(lcov, before, options) {
 	);
 }
 
+const getAllFiles = function(dirPath, arrayOfFiles) {
+  let files = fs__default.readdirSync(dirPath);
+  arrayOfFiles = arrayOfFiles || [];
+
+  files.forEach(function(file) {
+    if (fs__default.statSync(dirPath + "/" + file).isDirectory()) {
+      arrayOfFiles = getAllFiles(dirPath + "/" + file, arrayOfFiles);
+    } else {
+      if( file.includes('.info')){
+        arrayOfFiles.push(path.join(path.resolve(), dirPath, "/", file));
+      }
+    }
+  });
+
+  return arrayOfFiles
+};
+
 async function main$1() {
 	const token = core$1.getInput("github-token");
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
@@ -22924,15 +22941,15 @@ async function main$1() {
 	// Add base path for monorepo
 	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
 
-	let dirCont = await fs.promises.readdir(monorepoBasePath);
-	let files = dirCont.filter( function( elm ) {return elm.match(/.*\.(info)/ig);});
-  for (const file of files) {
-    console.log(file);
-  }
+	const lcovArray = getAllFiles(monorepoBasePath);
+
+	let raw = "";
+	lcovArray.forEach(function(lcovFile) {
+		raw += fs__default.readFileSync(lcovFile, "utf-8");
+	});
 
 
-
-	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
+	//const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null)
 	if (!raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
 		return;
