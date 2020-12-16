@@ -22881,8 +22881,7 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcov, lcovArrayWithRaw, options) {
-	console.log("lcovArrayWithRaw", lcovArrayWithRaw);
+function comment(lcov, options) {
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
@@ -22893,7 +22892,8 @@ function comment(lcov, lcovArrayWithRaw, options) {
 
 function diff(lcov, lcovArrayWithRaw, before, options) {
 	if (!before) {
-		return comment(lcov, lcovArrayWithRaw, options);
+		console.log("lcovArrayWithRaw", lcovArrayWithRaw);
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
