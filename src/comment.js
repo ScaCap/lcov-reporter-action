@@ -19,7 +19,7 @@ export function comment(lcov, lcovArrayWithRaw, options) {
 	});
 
 	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
+		`Coverage after merging ${b(options.head)} into ${b(options.base)} <br/>`,
 		HTML.join(""),
 	);
 }
