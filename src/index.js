@@ -74,7 +74,7 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: diff(lcov, baselcov, options),
+		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
 	});
 }
 
