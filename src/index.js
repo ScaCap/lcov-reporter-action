@@ -1,12 +1,14 @@
 import { promises as fs } from "fs";
 import core from "@actions/core";
-import { GitHub, context } from "@actions/github";
+import github from "@actions/github";
 
 import { parse } from "./lcov";
 import { diff } from "./comment";
 import { upsertComment } from "./github";
 
 async function main() {
+	const { context = {} } = github || {};
+
 	const token = core.getInput("github-token");
 	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core.getInput("lcov-base");
@@ -34,7 +36,7 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 
-	const githubClient = GitHub.getOctokit(token);
+	const githubClient = github.getOctokit(token);
 
 	await upsertComment({
 		githubClient,
