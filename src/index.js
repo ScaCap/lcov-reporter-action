@@ -6,10 +6,16 @@ import { parse } from "./lcov";
 import { diff } from "./comment";
 import { upsertComment } from "./github";
 
-const walkSync = (dir, filelist = []) => {
+/**
+ * Find all files inside a dir, recursively.
+ * @function getLcovFiles
+ * @param  {string} dir Dir path string.
+ * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
+ */
+const getLcovFiles = (dir, filelist = []) => {
 	fs.readdirSync(dir).forEach(file => {
 		filelist = fs.statSync(path.join(dir, file)).isDirectory()
-			? walkSync(path.join(dir, file), filelist)
+			? getLcovFiles(path.join(dir, file), filelist)
 			: filelist
 					.filter(file => {
 						return file.path.includes("lcov.info");
@@ -28,6 +34,8 @@ async function main() {
 	const token = core.getInput("github-token");
 	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core.getInput("lcov-base");
+	// Add base path for monorepo
+	const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
 
 	const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
@@ -41,16 +49,14 @@ async function main() {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
 
-	// Add base path for monorepo
-	const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
-	let lcovArray = walkSync(monorepoBasePath);
+	let lcovArray = getLcovFiles(monorepoBasePath);
 
-	const lcovArrayWithRaw = [];
+	const lcovArrayForMonorepo = [];
 	for (const file of lcovArray) {
 		if (file.path.includes(".info")) {
 			const raw = await promises.readFile(file.path, "utf8");
 			const data = await parse(raw);
-			lcovArrayWithRaw.push({
+			lcovArrayForMonorepo.push({
 				packageName: file.name,
 				lcov: data,
 			});
@@ -74,7 +80,7 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
+		body: diff(lcov, lcovArrayForMonorepo, baselcov, options),
 	});
 }
 

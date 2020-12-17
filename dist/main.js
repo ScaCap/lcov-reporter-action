@@ -5907,8 +5907,8 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
-function comment(lcov, lcovArrayWithRaw, options) {
-	const HTML = lcovArrayWithRaw.map(lcovObj => {
+function commentForMonorepo(lcovArrayForMonorepo, options) {
+	const HTML = lcovArrayForMonorepo.map(lcovObj => {
 		return `${table(
 			tbody(
 				tr(
@@ -5928,9 +5928,22 @@ function comment(lcov, lcovArrayWithRaw, options) {
 	);
 }
 
-function diff(lcov, lcovArrayWithRaw, before, options) {
+function comment(lcov, options) {
+	return fragment(
+		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
+		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
+		"\n\n",
+		details(summary("Coverage Report"), tabulate(lcov, options)),
+	);
+}
+
+function diff(lcov, lcovArrayForMonorepo, before, options) {
 	if (!before) {
-		return comment(lcov, lcovArrayWithRaw, options);
+		if (lcovArrayForMonorepo.length) {
+			return commentForMonorepo(lcovArrayForMonorepo, options);
+		} else {
+			return comment(lcov, lcovArrayForMonorepo);
+		}
 	}
 
 	const pbefore = percentage(before);
@@ -6038,10 +6051,16 @@ var github$2 = {
 };
 var github_1$1 = github$2.upsertComment;
 
-const walkSync = (dir, filelist = []) => {
+/**
+ * Find all files inside a dir, recursively.
+ * @function getLcovFiles
+ * @param  {string} dir Dir path string.
+ * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
+ */
+const getLcovFiles = (dir, filelist = []) => {
 	fs__default.readdirSync(dir).forEach(file => {
 		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
-			? walkSync(path.join(dir, file), filelist)
+			? getLcovFiles(path.join(dir, file), filelist)
 			: filelist
 					.filter(file => {
 						return file.path.includes("lcov.info");
@@ -6060,6 +6079,8 @@ async function main() {
 	const token = core$1.getInput("github-token");
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core$1.getInput("lcov-base");
+	// Add base path for monorepo
+	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
@@ -6073,16 +6094,14 @@ async function main() {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
 
-	// Add base path for monorepo
-	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
-	let lcovArray = walkSync(monorepoBasePath);
+	let lcovArray = getLcovFiles(monorepoBasePath);
 
-	const lcovArrayWithRaw = [];
+	const lcovArrayForMonorepo = [];
 	for (const file of lcovArray) {
 		if (file.path.includes(".info")) {
 			const raw = await fs.promises.readFile(file.path, "utf8");
 			const data = await parse$1(raw);
-			lcovArrayWithRaw.push({
+			lcovArrayForMonorepo.push({
 				packageName: file.name,
 				lcov: data,
 			});
@@ -6106,7 +6125,7 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: diff(lcov, lcovArrayWithRaw, baselcov, options),
+		body: diff(lcov, lcovArrayForMonorepo, baselcov, options),
 	});
 }
 

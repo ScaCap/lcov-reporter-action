@@ -3,8 +3,8 @@ import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
-export function comment(lcov, lcovArrayWithRaw, options) {
-	const HTML = lcovArrayWithRaw.map(lcovObj => {
+export function commentForMonorepo(lcovArrayForMonorepo, options) {
+	const HTML = lcovArrayForMonorepo.map(lcovObj => {
 		return `${table(
 			tbody(
 				tr(
@@ -24,9 +24,22 @@ export function comment(lcov, lcovArrayWithRaw, options) {
 	);
 }
 
-export function diff(lcov, lcovArrayWithRaw, before, options) {
+export function comment(lcov, options) {
+	return fragment(
+		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
+		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
+		"\n\n",
+		details(summary("Coverage Report"), tabulate(lcov, options)),
+	);
+}
+
+export function diff(lcov, lcovArrayForMonorepo, before, options) {
 	if (!before) {
-		return comment(lcov, lcovArrayWithRaw, options);
+		if (lcovArrayForMonorepo.length) {
+			return commentForMonorepo(lcovArrayForMonorepo, options);
+		} else {
+			return comment(lcov, lcovArrayForMonorepo, options);
+		}
 	}
 
 	const pbefore = percentage(before);
