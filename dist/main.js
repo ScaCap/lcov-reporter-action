@@ -5922,12 +5922,16 @@ function commentForMonorepo(
 		const plus = pdiff > 0 ? "+" : "";
 		const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
+		const pdiffHtml = baseLcov
+			? th(arrow, " ", plus, pdiff.toFixed(2), "%")
+			: "";
+
 		return `${table(
 			tbody(
 				tr(
 					th(lcovObj.packageName),
 					th(percentage(lcovObj.lcov).toFixed(2), "%"),
-					th(arrow, " ", plus, pdiff.toFixed(2), "%"),
+					pdiffHtml,
 				),
 			),
 		)} \n\n ${details(
