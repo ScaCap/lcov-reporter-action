@@ -45,7 +45,7 @@ with:
 ### Code coverage comment for single repo
 
 ```yml
-uses: ScaCap/monorepo-jest-reporter-action@v1
+uses: ScaCap/code-coverage-assistant@v1
 with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     lcov-file: './app/coverage/lcov.info'
