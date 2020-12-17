@@ -59,7 +59,9 @@ async function main() {
 	// Add base path for monorepo
 	const monorepoBasePath = core.getInput("monorepo-base-path");
 
-	const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null);
+	const raw =
+		!monorepoBasePath &&
+		(await promises.readFile(lcovFile, "utf-8").catch(err => null));
 	if (!monorepoBasePath && !raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
 		return;
@@ -70,6 +72,8 @@ async function main() {
 	if (!monorepoBasePath && baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
+
+	console.log("monorepoBasePath", monorepoBasePath);
 
 	let lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
 	let lcovBaseArray = monorepoBasePath
@@ -108,7 +112,7 @@ async function main() {
 		base: context.payload.pull_request.base.ref,
 	};
 
-	const lcov = await parse(raw);
+	const lcov = !monorepoBasePath && (await parse(raw));
 	const baselcov = baseRaw && (await parse(baseRaw));
 
 	const client = github.getOctokit(token);
