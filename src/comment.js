@@ -18,7 +18,7 @@ export function commentForMonorepo(
             el => el.packageName === lcovObj.packageName,
         );
 
-        const pbefore = baseLcov ? percentage(baseLcov) : 0;
+        const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
         const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
         const pdiff = pafter - pbefore;
         const plus = pdiff > 0 ? "+" : "";
