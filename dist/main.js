@@ -5763,43 +5763,43 @@ lib$1.source = source;
 
 // Parse lcov string into lcov data
 function parse$1(data) {
-	return new Promise(function(resolve, reject) {
-		lib$1(data, function(err, res) {
-			if (err) {
-				reject(err);
-				return;
-			}
-			resolve(res);
-		});
-	});
+    return new Promise(function(resolve, reject) {
+        lib$1(data, function(err, res) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(res);
+        });
+    });
 }
 
 // Get the total coverage percentage from the lcov data.
 function percentage(lcov) {
-	let hit = 0;
-	let found = 0;
-	for (const entry of lcov) {
-		hit += entry.lines.hit;
-		found += entry.lines.found;
-	}
+    let hit = 0;
+    let found = 0;
+    for (const entry of lcov) {
+        hit += entry.lines.hit;
+        found += entry.lines.found;
+    }
 
-	return (hit / found) * 100;
+    return (hit / found) * 100;
 }
 
 function tag(name) {
-	return function(...children) {
-		const props =
-			typeof children[0] === "object"
-				? Object.keys(children[0])
-						.map(key => ` ${key}='${children[0][key]}'`)
-						.join("")
-				: "";
+    return function(...children) {
+        const props =
+            typeof children[0] === "object"
+                ? Object.keys(children[0])
+                      .map(key => ` ${key}='${children[0][key]}'`)
+                      .join("")
+                : "";
 
-		const c =
-			typeof children[0] === "string" ? children : children.slice(1);
+        const c =
+            typeof children[0] === "string" ? children : children.slice(1);
 
-		return `<${name}${props}>${c.join("")}</${name}>`;
-	};
+        return `<${name}${props}>${c.join("")}</${name}>`;
+    };
 }
 
 const details = tag("details");
@@ -5813,99 +5813,99 @@ const tbody = tag("tbody");
 const a = tag("a");
 
 const fragment = function(...children) {
-	return children.join("");
+    return children.join("");
 };
 
 // Tabulate the lcov data in a HTML table.
 function tabulate(lcov, options) {
-	const head = tr(
-		th("File"),
-		th("Branches"),
-		th("Funcs"),
-		th("Lines"),
-		th("Uncovered Lines"),
-	);
+    const head = tr(
+        th("File"),
+        th("Branches"),
+        th("Funcs"),
+        th("Lines"),
+        th("Uncovered Lines"),
+    );
 
-	const folders = {};
-	for (const file of lcov) {
-		const parts = file.file.replace(options.prefix, "").split("/");
-		const folder = parts.slice(0, -1).join("/");
-		folders[folder] = folders[folder] || [];
-		folders[folder].push(file);
-	}
+    const folders = {};
+    for (const file of lcov) {
+        const parts = file.file.replace(options.prefix, "").split("/");
+        const folder = parts.slice(0, -1).join("/");
+        folders[folder] = folders[folder] || [];
+        folders[folder].push(file);
+    }
 
-	const rows = Object.keys(folders)
-		.sort()
-		.reduce(
-			(acc, key) => [
-				...acc,
-				toFolder(key),
-				...folders[key].map(file => toRow(file, key !== "", options)),
-			],
-			[],
-		);
+    const rows = Object.keys(folders)
+        .sort()
+        .reduce(
+            (acc, key) => [
+                ...acc,
+                toFolder(key),
+                ...folders[key].map(file => toRow(file, key !== "", options)),
+            ],
+            [],
+        );
 
-	return table(tbody(head, ...rows));
+    return table(tbody(head, ...rows));
 }
 
 function toFolder(path) {
-	if (path === "") {
-		return "";
-	}
+    if (path === "") {
+        return "";
+    }
 
-	return tr(td({ colspan: 5 }, b(path)));
+    return tr(td({ colspan: 5 }, b(path)));
 }
 
 function toRow(file, indent, options) {
-	return tr(
-		td(filename(file, indent, options)),
-		td(percentage$1(file.branches)),
-		td(percentage$1(file.functions)),
-		td(percentage$1(file.lines)),
-		td(uncovered(file, options)),
-	);
+    return tr(
+        td(filename(file, indent, options)),
+        td(percentage$1(file.branches)),
+        td(percentage$1(file.functions)),
+        td(percentage$1(file.lines)),
+        td(uncovered(file, options)),
+    );
 }
 
 function filename(file, indent, options) {
-	const relative = file.file.replace(options.prefix, "");
-	const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
-	const parts = relative.split("/");
-	const last = parts[parts.length - 1];
-	const space = indent ? "&nbsp; &nbsp;" : "";
-	return fragment(space, a({ href }, last));
+    const relative = file.file.replace(options.prefix, "");
+    const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
+    const parts = relative.split("/");
+    const last = parts[parts.length - 1];
+    const space = indent ? "&nbsp; &nbsp;" : "";
+    return fragment(space, a({ href }, last));
 }
 
 function percentage$1(item) {
-	if (!item) {
-		return "N/A";
-	}
+    if (!item) {
+        return "N/A";
+    }
 
-	const value = item.found === 0 ? 100 : (item.hit / item.found) * 100;
-	const rounded = value.toFixed(2).replace(/\.0*$/, "");
+    const value = item.found === 0 ? 100 : (item.hit / item.found) * 100;
+    const rounded = value.toFixed(2).replace(/\.0*$/, "");
 
-	const tag = value === 100 ? fragment : b;
+    const tag = value === 100 ? fragment : b;
 
-	return tag(`${rounded}%`);
+    return tag(`${rounded}%`);
 }
 
 function uncovered(file, options) {
-	const branches = (file.branches ? file.branches.details : [])
-		.filter(branch => branch.taken === 0)
-		.map(branch => branch.line);
+    const branches = (file.branches ? file.branches.details : [])
+        .filter(branch => branch.taken === 0)
+        .map(branch => branch.line);
 
-	const lines = (file.lines ? file.lines.details : [])
-		.filter(line => line.hit === 0)
-		.map(line => line.line);
+    const lines = (file.lines ? file.lines.details : [])
+        .filter(line => line.hit === 0)
+        .map(line => line.line);
 
-	const all = [...branches, ...lines].sort();
+    const all = [...branches, ...lines].sort();
 
-	return all
-		.map(function(line) {
-			const relative = file.file.replace(options.prefix, "");
-			const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
-			return a({ href }, line);
-		})
-		.join(", ");
+    return all
+        .map(function(line) {
+            const relative = file.file.replace(options.prefix, "");
+            const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
+            return a({ href }, line);
+        })
+        .join(", ");
 }
 
 /**
@@ -5915,42 +5915,42 @@ function uncovered(file, options) {
  * @param {*} options
  */
 function commentForMonorepo(
-	lcovArrayForMonorepo,
-	lcovBaseArrayForMonorepo,
-	options,
+    lcovArrayForMonorepo,
+    lcovBaseArrayForMonorepo,
+    options,
 ) {
-	const html = lcovArrayForMonorepo.map(lcovObj => {
-		const baseLcov = lcovBaseArrayForMonorepo.find(
-			el => el.packageName === lcovObj.packageName,
-		);
-		const pbefore = baseLcov ? percentage(baseLcov) : 0;
-		const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-		const pdiff = pafter - pbefore;
-		const plus = pdiff > 0 ? "+" : "";
-		const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+    const html = lcovArrayForMonorepo.map(lcovObj => {
+        const baseLcov = lcovBaseArrayForMonorepo.find(
+            el => el.packageName === lcovObj.packageName,
+        );
+        const pbefore = baseLcov ? percentage(baseLcov) : 0;
+        const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
+        const pdiff = pafter - pbefore;
+        const plus = pdiff > 0 ? "+" : "";
+        const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
-		const pdiffHtml = baseLcov
-			? th(arrow, " ", plus, pdiff.toFixed(2), "%")
-			: "";
+        const pdiffHtml = baseLcov
+            ? th(arrow, " ", plus, pdiff.toFixed(2), "%")
+            : "";
 
-		return `${table(
-			tbody(
-				tr(
-					th(lcovObj.packageName),
-					th(percentage(lcovObj.lcov).toFixed(2), "%"),
-					pdiffHtml,
-				),
-			),
-		)} \n\n ${details(
-			summary("Coverage Report"),
-			tabulate(lcovObj.lcov, options),
-		)} <br/>`;
-	});
+        return `${table(
+            tbody(
+                tr(
+                    th(lcovObj.packageName),
+                    th(percentage(lcovObj.lcov).toFixed(2), "%"),
+                    pdiffHtml,
+                ),
+            ),
+        )} \n\n ${details(
+            summary("Coverage Report"),
+            tabulate(lcovObj.lcov, options),
+        )} <br/>`;
+    });
 
-	return fragment(
-		`Coverage after merging into ${b(options.base)} <p></p>`,
-		html.join(""),
-	);
+    return fragment(
+        `Coverage after merging into ${b(options.base)} <p></p>`,
+        html.join(""),
+    );
 }
 
 /**
@@ -5959,22 +5959,22 @@ function commentForMonorepo(
  * @param {*} options
  */
 function comment(lcov, before, options) {
-	const pbefore = before ? percentage(before) : 0;
-	const pafter = before ? percentage(lcov) : 0;
-	const pdiff = pafter - pbefore;
-	const plus = pdiff > 0 ? "+" : "";
-	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+    const pbefore = before ? percentage(before) : 0;
+    const pafter = before ? percentage(lcov) : 0;
+    const pdiff = pafter - pbefore;
+    const plus = pdiff > 0 ? "+" : "";
+    const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
-	const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
+    const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
 
-	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(
-			options.base,
-		)} <p></p>`,
-		table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
-		"\n\n",
-		details(summary("Coverage Report"), tabulate(lcov, options)),
-	);
+    return fragment(
+        `Coverage after merging ${b(options.head)} into ${b(
+            options.base,
+        )} <p></p>`,
+        table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
+        "\n\n",
+        details(summary("Coverage Report"), tabulate(lcov, options)),
+    );
 }
 
 /**
@@ -5984,7 +5984,7 @@ function comment(lcov, before, options) {
  * @param {*} options
  */
 function diff(lcov, before, options) {
-	return comment(lcov, before, options);
+    return comment(lcov, before, options);
 }
 
 /**
@@ -5994,15 +5994,15 @@ function diff(lcov, before, options) {
  * @param {*} options
  */
 function diffForMonorepo(
-	lcovArrayForMonorepo,
-	lcovBaseArrayForMonorepo,
-	options,
+    lcovArrayForMonorepo,
+    lcovBaseArrayForMonorepo,
+    options,
 ) {
-	return commentForMonorepo(
-		lcovArrayForMonorepo,
-		lcovBaseArrayForMonorepo,
-		options,
-	);
+    return commentForMonorepo(
+        lcovArrayForMonorepo,
+        lcovBaseArrayForMonorepo,
+        options,
+    );
 }
 
 // Modified from: https://github.com/slavcodev/coverage-monitor-action
@@ -6023,69 +6023,69 @@ const hiddenHeader = `<!-- monorepo-jest-reporter-action -->`;
 const appendHiddenHeaderToComment = body => hiddenHeader + body;
 
 const listComments = async ({ client, context, prNumber, commentHeader }) => {
-	const { data: existingComments } = await client.issues.listComments({
-		...context.repo,
-		issue_number: prNumber,
-	});
+    const { data: existingComments } = await client.issues.listComments({
+        ...context.repo,
+        issue_number: prNumber,
+    });
 
-	return existingComments.filter(({ body }) => body.startsWith(hiddenHeader));
+    return existingComments.filter(({ body }) => body.startsWith(hiddenHeader));
 };
 
 const insertComment = async ({ client, context, prNumber, body }) =>
-	client.issues.createComment({
-		...context.repo,
-		issue_number: prNumber,
-		body: appendHiddenHeaderToComment(body),
-	});
+    client.issues.createComment({
+        ...context.repo,
+        issue_number: prNumber,
+        body: appendHiddenHeaderToComment(body),
+    });
 
 const updateComment = async ({ client, context, body, commentId }) =>
-	client.issues.updateComment({
-		...context.repo,
-		comment_id: commentId,
-		body: appendHiddenHeaderToComment(body),
-	});
+    client.issues.updateComment({
+        ...context.repo,
+        comment_id: commentId,
+        body: appendHiddenHeaderToComment(body),
+    });
 
 const deleteComments = async ({ client, context, comments }) =>
-	Promise.all(
-		comments.map(({ id }) =>
-			client.issues.deleteComment({
-				...context.repo,
-				comment_id: id,
-			}),
-		),
-	);
+    Promise.all(
+        comments.map(({ id }) =>
+            client.issues.deleteComment({
+                ...context.repo,
+                comment_id: id,
+            }),
+        ),
+    );
 
 const upsertComment = async ({ client, context, prNumber, body }) => {
-	const existingComments = await listComments({
-		client,
-		context,
-		prNumber,
-	});
-	const last = existingComments.pop();
+    const existingComments = await listComments({
+        client,
+        context,
+        prNumber,
+    });
+    const last = existingComments.pop();
 
-	await deleteComments({
-		client,
-		context,
-		comments: existingComments,
-	});
+    await deleteComments({
+        client,
+        context,
+        comments: existingComments,
+    });
 
-	return last
-		? updateComment({
-				client,
-				context,
-				body,
-				commentId: last.id,
-		  })
-		: insertComment({
-				client,
-				context,
-				prNumber,
-				body,
-		  });
+    return last
+        ? updateComment({
+              client,
+              context,
+              body,
+              commentId: last.id,
+          })
+        : insertComment({
+              client,
+              context,
+              prNumber,
+              body,
+          });
 };
 
 var github$2 = {
-	upsertComment,
+    upsertComment,
 };
 var github_1$1 = github$2.upsertComment;
 
@@ -6096,19 +6096,19 @@ var github_1$1 = github$2.upsertComment;
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
  */
 const getLcovFiles = (dir, filelist = []) => {
-	fs__default.readdirSync(dir).forEach(file => {
-		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
-			? getLcovFiles(path.join(dir, file), filelist)
-			: filelist
-					.filter(file => {
-						return file.path.includes("lcov.info");
-					})
-					.concat({
-						name: dir.split("/")[1],
-						path: path.join(dir, file),
-					});
-	});
-	return filelist;
+    fs__default.readdirSync(dir).forEach(file => {
+        filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
+            ? getLcovFiles(path.join(dir, file), filelist)
+            : filelist
+                  .filter(file => {
+                      return file.path.includes("lcov.info");
+                  })
+                  .concat({
+                      name: dir.split("/")[1],
+                      path: path.join(dir, file),
+                  });
+    });
+    return filelist;
 };
 
 /**
@@ -6118,102 +6118,102 @@ const getLcovFiles = (dir, filelist = []) => {
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
  */
 const getLcovBaseFiles = (dir, filelist = []) => {
-	fs__default.readdirSync(dir).forEach(file => {
-		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
-			? getLcovBaseFiles(path.join(dir, file), filelist)
-			: filelist
-					.filter(file => {
-						return file.path.includes("lcov-base.info");
-					})
-					.concat({
-						name: dir.split("/")[1],
-						path: path.join(dir, file),
-					});
-	});
-	return filelist;
+    fs__default.readdirSync(dir).forEach(file => {
+        filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
+            ? getLcovBaseFiles(path.join(dir, file), filelist)
+            : filelist
+                  .filter(file => {
+                      return file.path.includes("lcov-base.info");
+                  })
+                  .concat({
+                      name: dir.split("/")[1],
+                      path: path.join(dir, file),
+                  });
+    });
+    return filelist;
 };
 
 async function main() {
-	const { context = {} } = github$1 || {};
+    const { context = {} } = github$1 || {};
 
-	const token = core$1.getInput("github-token");
-	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
-	const baseFile = core$1.getInput("lcov-base");
-	// Add base path for monorepo
-	const monorepoBasePath = core$1.getInput("monorepo-base-path");
+    const token = core$1.getInput("github-token");
+    const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
+    const baseFile = core$1.getInput("lcov-base");
+    // Add base path for monorepo
+    const monorepoBasePath = core$1.getInput("monorepo-base-path");
 
-	const raw =
-		!monorepoBasePath &&
-		(await fs.promises.readFile(lcovFile, "utf-8").catch(err => null));
-	if (!monorepoBasePath && !raw) {
-		console.log(`No coverage report found at '${lcovFile}', exiting...`);
-		return;
-	}
+    const raw =
+        !monorepoBasePath &&
+        (await fs.promises.readFile(lcovFile, "utf-8").catch(err => null));
+    if (!monorepoBasePath && !raw) {
+        console.log(`No coverage report found at '${lcovFile}', exiting...`);
+        return;
+    }
 
-	const baseRaw =
-		baseFile &&
-		(await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
-	if (!monorepoBasePath && baseFile && !baseRaw) {
-		console.log(`No coverage report found at '${baseFile}', ignoring...`);
-	}
+    const baseRaw =
+        baseFile &&
+        (await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
+    if (!monorepoBasePath && baseFile && !baseRaw) {
+        console.log(`No coverage report found at '${baseFile}', ignoring...`);
+    }
 
-	let lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
-	let lcovBaseArray = monorepoBasePath
-		? getLcovBaseFiles(monorepoBasePath)
-		: [];
+    let lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
+    let lcovBaseArray = monorepoBasePath
+        ? getLcovBaseFiles(monorepoBasePath)
+        : [];
 
-	const lcovArrayForMonorepo = [];
-	const lcovBaseArrayForMonorepo = [];
-	for (const file of lcovArray) {
-		if (file.path.includes(".info")) {
-			const raw = await fs.promises.readFile(file.path, "utf8");
-			const data = await parse$1(raw);
-			lcovArrayForMonorepo.push({
-				packageName: file.name,
-				lcov: data,
-			});
-		}
-	}
+    const lcovArrayForMonorepo = [];
+    const lcovBaseArrayForMonorepo = [];
+    for (const file of lcovArray) {
+        if (file.path.includes(".info")) {
+            const raw = await fs.promises.readFile(file.path, "utf8");
+            const data = await parse$1(raw);
+            lcovArrayForMonorepo.push({
+                packageName: file.name,
+                lcov: data,
+            });
+        }
+    }
 
-	for (const file of lcovBaseArray) {
-		if (file.path.includes(".info")) {
-			const raw = await fs.promises.readFile(file.path, "utf8");
-			const data = await parse$1(raw);
-			lcovBaseArrayForMonorepo.push({
-				packageName: file.name,
-				lcov: data,
-			});
-		}
-	}
+    for (const file of lcovBaseArray) {
+        if (file.path.includes(".info")) {
+            const raw = await fs.promises.readFile(file.path, "utf8");
+            const data = await parse$1(raw);
+            lcovBaseArrayForMonorepo.push({
+                packageName: file.name,
+                lcov: data,
+            });
+        }
+    }
 
-	const options = {
-		repository: context.payload.repository.full_name,
-		commit: context.payload.pull_request.head.sha,
-		prefix: `${process.env.GITHUB_WORKSPACE}/`,
-		head: context.payload.pull_request.head.ref,
-		base: context.payload.pull_request.base.ref,
-	};
+    const options = {
+        repository: context.payload.repository.full_name,
+        commit: context.payload.pull_request.head.sha,
+        prefix: `${process.env.GITHUB_WORKSPACE}/`,
+        head: context.payload.pull_request.head.ref,
+        base: context.payload.pull_request.base.ref,
+    };
 
-	const lcov = !monorepoBasePath && (await parse$1(raw));
-	const baselcov = baseRaw && (await parse$1(baseRaw));
+    const lcov = !monorepoBasePath && (await parse$1(raw));
+    const baselcov = baseRaw && (await parse$1(baseRaw));
 
-	const client = github$1.getOctokit(token);
+    const client = github$1.getOctokit(token);
 
-	await github_1$1({
-		client,
-		context,
-		prNumber: context.payload.pull_request.number,
-		body: !lcovArrayForMonorepo.length
-			? diff(lcov, baselcov, options)
-			: diffForMonorepo(
-					lcovArrayForMonorepo,
-					lcovBaseArrayForMonorepo,
-					options,
-			  ),
-	});
+    await github_1$1({
+        client,
+        context,
+        prNumber: context.payload.pull_request.number,
+        body: !lcovArrayForMonorepo.length
+            ? diff(lcov, baselcov, options)
+            : diffForMonorepo(
+                  lcovArrayForMonorepo,
+                  lcovBaseArrayForMonorepo,
+                  options,
+              ),
+    });
 }
 
 main().catch(function(err) {
-	console.log(err);
-	core$1.setFailed(err.message);
+    console.log(err);
+    core$1.setFailed(err.message);
 });
