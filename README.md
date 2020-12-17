@@ -1,7 +1,7 @@
 # Code Coverage Assistant
 [![CI](https://github.com/peter-evans/create-pull-request/workflows/CI/badge.svg)](https://github.com/ScaCap/code-coverage-assistant/actions?query=workflow%3ACI)
 
-Github action to assist the pull request with code coverage stats
+> [GitHub Action](https://help.github.com/en/actions) to assist the pull request with code coverage stats
  - ✅  &nbsp;Code coverage comment for monorepo
  - ✅  &nbsp;Code coverage comment for single repo
  - ✅  &nbsp;Code coverage diff from base branch
