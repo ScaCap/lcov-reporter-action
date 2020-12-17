@@ -77,4 +77,6 @@ jobs:
             - name: Build
               run: yarn build
             - name: Ensure that the committed dist matches the build
-              run: git diff-index --quiet --exit-code HEAD -- ./dist/main.js
+              # See if there are any diffs in the dist file. Grep returns an error
+              # when there are no changes, so we flip the output
+              run: (git diff --name-only | grep dist/main.js || exit 0 && exit 1)
