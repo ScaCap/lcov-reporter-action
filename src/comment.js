@@ -1,10 +1,9 @@
 import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
-
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
 export function commentForMonorepo(lcovArrayForMonorepo, options) {
-	const HTML = lcovArrayForMonorepo.map(lcovObj => {
+	const html = lcovArrayForMonorepo.map(lcovObj => {
 		return `${table(
 			tbody(
 				tr(
@@ -19,8 +18,8 @@ export function commentForMonorepo(lcovArrayForMonorepo, options) {
 	});
 
 	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(options.base)} <p></p>`,
-		HTML.join(""),
+		`Coverage after merging into ${b(options.base)} <p></p>`,
+		html.join(""),
 	);
 }
 
