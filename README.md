@@ -58,7 +58,7 @@ with:
 ⚠️ &nbsp;Note: This config expects a `lcov-base.info` coverage file for base branch in your `.coverage` dir
 
 ```yml
-uses: ScaCap/monorepo-jest-reporter-action@v1
+uses: ScaCap/code-coverage-assistant@v1
 with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     monorepo-base-path: './packages'
