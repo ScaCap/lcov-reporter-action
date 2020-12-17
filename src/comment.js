@@ -63,7 +63,7 @@ export function diffForMonorepo(
 	lcovBaseArrayForMonorepo,
 	options,
 ) {
-	if (!lcovBaseArrayForMonorepo) {
+	if (!lcovBaseArrayForMonorepo.length) {
 		return commentForMonorepo(lcovArrayForMonorepo, options);
 	}
 
