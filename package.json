@@ -57,6 +57,8 @@
 	},
 	"prettier": {
 		"tabWidth": 4,
+		"useTabs": false,
+		"bracketSpacing": true,
 		"trailingComma": "all"
 	}
 }

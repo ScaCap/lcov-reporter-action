@@ -9,42 +9,42 @@ import { tabulate } from "./tabulate";
  * @param {*} options
  */
 export function commentForMonorepo(
-	lcovArrayForMonorepo,
-	lcovBaseArrayForMonorepo,
-	options,
+    lcovArrayForMonorepo,
+    lcovBaseArrayForMonorepo,
+    options,
 ) {
-	const html = lcovArrayForMonorepo.map(lcovObj => {
-		const baseLcov = lcovBaseArrayForMonorepo.find(
-			el => el.packageName === lcovObj.packageName,
-		);
-		const pbefore = baseLcov ? percentage(baseLcov) : 0;
-		const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-		const pdiff = pafter - pbefore;
-		const plus = pdiff > 0 ? "+" : "";
-		const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+    const html = lcovArrayForMonorepo.map(lcovObj => {
+        const baseLcov = lcovBaseArrayForMonorepo.find(
+            el => el.packageName === lcovObj.packageName,
+        );
+        const pbefore = baseLcov ? percentage(baseLcov) : 0;
+        const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
+        const pdiff = pafter - pbefore;
+        const plus = pdiff > 0 ? "+" : "";
+        const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
-		const pdiffHtml = baseLcov
-			? th(arrow, " ", plus, pdiff.toFixed(2), "%")
-			: "";
+        const pdiffHtml = baseLcov
+            ? th(arrow, " ", plus, pdiff.toFixed(2), "%")
+            : "";
 
-		return `${table(
-			tbody(
-				tr(
-					th(lcovObj.packageName),
-					th(percentage(lcovObj.lcov).toFixed(2), "%"),
-					pdiffHtml,
-				),
-			),
-		)} \n\n ${details(
-			summary("Coverage Report"),
-			tabulate(lcovObj.lcov, options),
-		)} <br/>`;
-	});
+        return `${table(
+            tbody(
+                tr(
+                    th(lcovObj.packageName),
+                    th(percentage(lcovObj.lcov).toFixed(2), "%"),
+                    pdiffHtml,
+                ),
+            ),
+        )} \n\n ${details(
+            summary("Coverage Report"),
+            tabulate(lcovObj.lcov, options),
+        )} <br/>`;
+    });
 
-	return fragment(
-		`Coverage after merging into ${b(options.base)} <p></p>`,
-		html.join(""),
-	);
+    return fragment(
+        `Coverage after merging into ${b(options.base)} <p></p>`,
+        html.join(""),
+    );
 }
 
 /**
@@ -53,22 +53,22 @@ export function commentForMonorepo(
  * @param {*} options
  */
 export function comment(lcov, before, options) {
-	const pbefore = before ? percentage(before) : 0;
-	const pafter = before ? percentage(lcov) : 0;
-	const pdiff = pafter - pbefore;
-	const plus = pdiff > 0 ? "+" : "";
-	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+    const pbefore = before ? percentage(before) : 0;
+    const pafter = before ? percentage(lcov) : 0;
+    const pdiff = pafter - pbefore;
+    const plus = pdiff > 0 ? "+" : "";
+    const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
-	const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
+    const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
 
-	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(
-			options.base,
-		)} <p></p>`,
-		table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
-		"\n\n",
-		details(summary("Coverage Report"), tabulate(lcov, options)),
-	);
+    return fragment(
+        `Coverage after merging ${b(options.head)} into ${b(
+            options.base,
+        )} <p></p>`,
+        table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
+        "\n\n",
+        details(summary("Coverage Report"), tabulate(lcov, options)),
+    );
 }
 
 /**
@@ -78,7 +78,7 @@ export function comment(lcov, before, options) {
  * @param {*} options
  */
 export function diff(lcov, before, options) {
-	return comment(lcov, before, options);
+    return comment(lcov, before, options);
 }
 
 /**
@@ -88,13 +88,13 @@ export function diff(lcov, before, options) {
  * @param {*} options
  */
 export function diffForMonorepo(
-	lcovArrayForMonorepo,
-	lcovBaseArrayForMonorepo,
-	options,
+    lcovArrayForMonorepo,
+    lcovBaseArrayForMonorepo,
+    options,
 ) {
-	return commentForMonorepo(
-		lcovArrayForMonorepo,
-		lcovBaseArrayForMonorepo,
-		options,
-	);
+    return commentForMonorepo(
+        lcovArrayForMonorepo,
+        lcovBaseArrayForMonorepo,
+        options,
+    );
 }
