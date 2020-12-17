@@ -11,15 +11,36 @@ import { upsertComment } from "./github";
  * @function getLcovFiles
  * @param  {string} dir Dir path string.
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
- * @param {string} lcovFileName  path string  for lcov file for PR or base lcov file.
  */
-const getLcovFiles = (dir, filelist = [], lcovFileName = "lcov.info") => {
+const getLcovFiles = (dir, filelist = []) => {
     fs.readdirSync(dir).forEach(file => {
         filelist = fs.statSync(path.join(dir, file)).isDirectory()
             ? getLcovFiles(path.join(dir, file), filelist)
             : filelist
                   .filter(file => {
-                      return file.path.includes(lcovFileName);
+                      return file.path.includes("lcov.info");
+                  })
+                  .concat({
+                      name: dir.split("/")[1],
+                      path: path.join(dir, file),
+                  });
+    });
+    return filelist;
+};
+
+/**
+ * Find all files inside a dir, recursively for base branch.
+ * @function getLcovBaseFiles
+ * @param  {string} dir Dir path string.
+ * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
+ */
+const getLcovBaseFiles = (dir, filelist = []) => {
+    fs.readdirSync(dir).forEach(file => {
+        filelist = fs.statSync(path.join(dir, file)).isDirectory()
+            ? getLcovBaseFiles(path.join(dir, file), filelist)
+            : filelist
+                  .filter(file => {
+                      return file.path.includes("lcov-base.info");
                   })
                   .concat({
                       name: dir.split("/")[1],
@@ -55,7 +76,7 @@ async function main() {
 
     let lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
     let lcovBaseArray = monorepoBasePath
-        ? getLcovFiles(monorepoBasePath, [], "lcov-base.info")
+        ? getLcovBaseFiles(monorepoBasePath)
         : [];
 
     const lcovArrayForMonorepo = [];
