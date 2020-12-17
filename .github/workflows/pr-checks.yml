@@ -77,4 +77,4 @@ jobs:
             - name: Build
               run: yarn build
             - name: Ensure that the committed dist matches the build
-              run: git diff-index --quiet HEAD -- ./dist/main.js
+              run: git diff-index --quiet --exit-code HEAD -- ./dist/main.js
