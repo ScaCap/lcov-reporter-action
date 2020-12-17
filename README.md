@@ -39,10 +39,15 @@ The location of the monrepo `packages` path
 ```yml
 uses: romeovs/lcov-reporter-action@v0.2.16
 with:
-  github-token: ${{ secrets.GITHUB_TOKEN }}
-  lcov-file: ./coverage/lcov.info
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    lcov-file: ./coverage/lcov.info
 ```
 
 ## Acknowledgements
 
-The initial code is based on [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action).
+The initial code is based on [romeovs/lcov-reporter-action](https://github.com/romeovs/lcov-reporter-action).
+
+Thanks to:
+
+-   [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action)
+-   [slavcodev/coverage-monitor-action](https://github.com/slavcodev/coverage-monitor-action)
