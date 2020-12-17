@@ -32,13 +32,9 @@ export function comment(lcov, options) {
 	);
 }
 
-export function diff(lcov, lcovArrayForMonorepo, before, options) {
+export function diff(lcov, before, options) {
 	if (!before) {
-		if (lcovArrayForMonorepo.length) {
-			return commentForMonorepo(lcovArrayForMonorepo, options);
-		} else {
-			return comment(lcov, lcovArrayForMonorepo, options);
-		}
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
@@ -60,4 +56,34 @@ export function diff(lcov, lcovArrayForMonorepo, before, options) {
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
+}
+
+export function diffForMonorepo(
+	lcovArrayForMonorepo,
+	lcovBaseArrayForMonorepo,
+	options,
+) {
+	if (!lcovBaseArrayForMonorepo) {
+		return commentForMonorepo(lcovArrayForMonorepo, options);
+	}
+
+	// const pbefore = percentage(before);
+	// const pafter = percentage(lcov);
+	// const pdiff = pafter - pbefore;
+	// const plus = pdiff > 0 ? "+" : "";
+	// const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+
+	// return fragment(
+	// 	`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
+	// 	table(
+	// 		tbody(
+	// 			tr(
+	// 				th(pafter.toFixed(2), "%"),
+	// 				th(arrow, " ", plus, pdiff.toFixed(2), "%"),
+	// 			),
+	// 		),
+	// 	),
+	// 	"\n\n",
+	// 	details(summary("Coverage Report"), tabulate(lcov, options)),
+	// );
 }

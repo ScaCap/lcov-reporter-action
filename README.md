@@ -16,19 +16,23 @@ Total Coverage: <b>99.39%</b>
 ## Inputs
 
 ##### `github-token` (**Required**)
+
 Github token used for posting the comment. To use the key provided by the GitHub
 action runner, use `${{ secrets.GITHUB_TOKEN }}`.
 
 ##### `lcov-file` (**Optional**)
+
 The location of the lcov file to read the coverage report from. Defaults to
 `./coverage/lcov.info`.
 
 ##### `lcov-base` (**Optional**)
+
 The location of the lcov file resulting from running the tests in the base
 branch. When this is set a diff of the coverage percentages is shown.
 
 ##### `monorepo-base` (**Optional**)
-The location of the monrepo `packages/` path
+
+The location of the monrepo `packages` path
 
 ## Example usage
 

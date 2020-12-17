@@ -3,7 +3,7 @@ import core from "@actions/core";
 import github from "@actions/github";
 import path from "path";
 import { parse } from "./lcov";
-import { diff } from "./comment";
+import { diff, diffForMonorepo } from "./comment";
 import { upsertComment } from "./github";
 
 /**
@@ -19,6 +19,28 @@ const getLcovFiles = (dir, filelist = []) => {
 			: filelist
 					.filter(file => {
 						return file.path.includes("lcov.info");
+					})
+					.concat({
+						name: dir.split("/")[1],
+						path: path.join(dir, file),
+					});
+	});
+	return filelist;
+};
+
+/**
+ * Find all files inside a dir, recursively for base branch.
+ * @function getLcovBaseFiles
+ * @param  {string} dir Dir path string.
+ * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
+ */
+const getLcovBaseFiles = (dir, filelist = []) => {
+	fs.readdirSync(dir).forEach(file => {
+		filelist = fs.statSync(path.join(dir, file)).isDirectory()
+			? getLcovBaseFiles(path.join(dir, file), filelist)
+			: filelist
+					.filter(file => {
+						return file.path.includes("lcov-base.info");
 					})
 					.concat({
 						name: dir.split("/")[1],
@@ -50,13 +72,26 @@ async function main() {
 	}
 
 	let lcovArray = getLcovFiles(monorepoBasePath);
+	let lcovBaseArray = getLcovBaseFiles(monorepoBasePath);
 
 	const lcovArrayForMonorepo = [];
+	const lcovBaseArrayForMonorepo = [];
 	for (const file of lcovArray) {
 		if (file.path.includes(".info")) {
 			const raw = await promises.readFile(file.path, "utf8");
 			const data = await parse(raw);
 			lcovArrayForMonorepo.push({
+				packageName: file.name,
+				lcov: data,
+			});
+		}
+	}
+
+	for (const file of lcovBaseArray) {
+		if (file.path.includes(".info")) {
+			const raw = await promises.readFile(file.path, "utf8");
+			const data = await parse(raw);
+			lcovBaseArrayForMonorepo.push({
 				packageName: file.name,
 				lcov: data,
 			});
@@ -80,7 +115,9 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: diff(lcov, lcovArrayForMonorepo, baselcov, options),
+		body: lcovArrayForMonorepo.length
+			? diff(lcov, baselcov, options)
+			: diffForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo.options),
 	});
 }
 

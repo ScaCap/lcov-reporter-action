@@ -5937,13 +5937,9 @@ function comment(lcov, options) {
 	);
 }
 
-function diff(lcov, lcovArrayForMonorepo, before, options) {
+function diff(lcov, before, options) {
 	if (!before) {
-		if (lcovArrayForMonorepo.length) {
-			return commentForMonorepo(lcovArrayForMonorepo, options);
-		} else {
-			return comment(lcov, lcovArrayForMonorepo);
-		}
+		return comment(lcov, options);
 	}
 
 	const pbefore = percentage(before);
@@ -5965,6 +5961,36 @@ function diff(lcov, lcovArrayForMonorepo, before, options) {
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
+}
+
+function diffForMonorepo(
+	lcovArrayForMonorepo,
+	lcovBaseArrayForMonorepo,
+	options,
+) {
+	if (!lcovBaseArrayForMonorepo) {
+		return commentForMonorepo(lcovArrayForMonorepo, options);
+	}
+
+	// const pbefore = percentage(before);
+	// const pafter = percentage(lcov);
+	// const pdiff = pafter - pbefore;
+	// const plus = pdiff > 0 ? "+" : "";
+	// const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+
+	// return fragment(
+	// 	`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
+	// 	table(
+	// 		tbody(
+	// 			tr(
+	// 				th(pafter.toFixed(2), "%"),
+	// 				th(arrow, " ", plus, pdiff.toFixed(2), "%"),
+	// 			),
+	// 		),
+	// 	),
+	// 	"\n\n",
+	// 	details(summary("Coverage Report"), tabulate(lcov, options)),
+	// );
 }
 
 // Modified from: https://github.com/slavcodev/coverage-monitor-action
@@ -6073,6 +6099,28 @@ const getLcovFiles = (dir, filelist = []) => {
 	return filelist;
 };
 
+/**
+ * Find all files inside a dir, recursively for base branch.
+ * @function getLcovBaseFiles
+ * @param  {string} dir Dir path string.
+ * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
+ */
+const getLcovBaseFiles = (dir, filelist = []) => {
+	fs__default.readdirSync(dir).forEach(file => {
+		filelist = fs__default.statSync(path.join(dir, file)).isDirectory()
+			? getLcovBaseFiles(path.join(dir, file), filelist)
+			: filelist
+					.filter(file => {
+						return file.path.includes("lcov-base.info");
+					})
+					.concat({
+						name: dir.split("/")[1],
+						path: path.join(dir, file),
+					});
+	});
+	return filelist;
+};
+
 async function main() {
 	const { context = {} } = github$1 || {};
 
@@ -6095,13 +6143,26 @@ async function main() {
 	}
 
 	let lcovArray = getLcovFiles(monorepoBasePath);
+	let lcovBaseArray = getLcovBaseFiles(monorepoBasePath);
 
 	const lcovArrayForMonorepo = [];
+	const lcovBaseArrayForMonorepo = [];
 	for (const file of lcovArray) {
 		if (file.path.includes(".info")) {
 			const raw = await fs.promises.readFile(file.path, "utf8");
 			const data = await parse$1(raw);
 			lcovArrayForMonorepo.push({
+				packageName: file.name,
+				lcov: data,
+			});
+		}
+	}
+
+	for (const file of lcovBaseArray) {
+		if (file.path.includes(".info")) {
+			const raw = await fs.promises.readFile(file.path, "utf8");
+			const data = await parse$1(raw);
+			lcovBaseArrayForMonorepo.push({
 				packageName: file.name,
 				lcov: data,
 			});
@@ -6125,7 +6186,9 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: diff(lcov, lcovArrayForMonorepo, baselcov, options),
+		body: lcovArrayForMonorepo.length
+			? diff(lcov, baselcov, options)
+			: diffForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo.options),
 	});
 }
 
