@@ -6140,14 +6140,14 @@ async function main() {
 	const monorepoBasePath = core$1.getInput("monorepo-base-path");
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
-	if (!raw) {
+	if (!monorepoBasePath && !raw) {
 		console.log(`No coverage report found at '${lcovFile}', exiting...`);
 		return;
 	}
 
 	const baseRaw =
 		baseFile && (await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
-	if (baseFile && !baseRaw) {
+	if (!monorepoBasePath && baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}
 
