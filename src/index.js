@@ -55,7 +55,7 @@ async function main() {
 
     let lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
     let lcovBaseArray = monorepoBasePath
-        ? getLcovFiles(monorepoBasePath, "lcov-base.info")
+        ? getLcovFiles(monorepoBasePath, [], "lcov-base.info")
         : [];
 
     const lcovArrayForMonorepo = [];
