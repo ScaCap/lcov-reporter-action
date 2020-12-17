@@ -61,8 +61,8 @@
     },
     "jest": {
         "testMatch": [
-            "<rootDir>/src/*_test.js",
-            "<rootDir>/src/**/*_test.js"
+            "<rootDir>/src/*.test.js",
+            "<rootDir>/src/**/*.test.js"
         ]
     },
     "prettier": {

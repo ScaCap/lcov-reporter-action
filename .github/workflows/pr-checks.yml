@@ -55,7 +55,7 @@ jobs:
               uses: ScaCap/code-coverage-assistant@master
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
-                  lcov-file: ./lcov.info
+                  lcov-file: ./coverage/lcov.info
 
     build:
         name: Check build is committed
