@@ -8,12 +8,11 @@ export function commentForMonorepo(
 	options,
 ) {
 	const html = lcovArrayForMonorepo.map(lcovObj => {
-		const pbefore = percentage(
-			lcovBaseArrayForMonorepo.find(
-				el => el.packageName === lcovObj.packageName,
-			).lcov,
+		const baseLcov = lcovBaseArrayForMonorepo.find(
+			el => el.packageName === lcovObj.packageName,
 		);
-		const pafter = percentage(lcovObj.lcov);
+		const pbefore = baseLcov ? percentage(baseLcov) : 0;
+		const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
 		const pdiff = pafter - pbefore;
 		const plus = pdiff > 0 ? "+" : "";
 		const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
