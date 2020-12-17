@@ -34,7 +34,7 @@ The possible inputs for this action are:
 ### Code coverage comment for monorepo
 
 ```yml
-uses: ScaCap/monorepo-jest-reporter-action@v1
+uses: ScaCap/code-coverage-assistant@v1
 with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     monorepo-base-path: './packages'
