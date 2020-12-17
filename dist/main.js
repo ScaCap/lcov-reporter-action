@@ -6186,7 +6186,7 @@ async function main() {
 		client,
 		context,
 		prNumber: context.payload.pull_request.number,
-		body: lcovArrayForMonorepo.length
+		body: !lcovArrayForMonorepo.length
 			? diff(lcov, baselcov, options)
 			: diffForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo.options),
 	});
