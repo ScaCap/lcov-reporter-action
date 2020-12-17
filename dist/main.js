@@ -6188,7 +6188,11 @@ async function main() {
 		prNumber: context.payload.pull_request.number,
 		body: !lcovArrayForMonorepo.length
 			? diff(lcov, baselcov, options)
-			: diffForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo.options),
+			: diffForMonorepo(
+					lcovArrayForMonorepo,
+					lcovBaseArrayForMonorepo,
+					options,
+			  ),
 	});
 }
 
