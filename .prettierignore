@@ -1,1 +1,6 @@
 dist/*
+package.json
+.eslintrc.json
+.github/
+README.md
+yarn.lock
