@@ -1,0 +1,80 @@
+name: PR checks
+
+on: pull_request
+
+env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    HUSKY_SKIP_INSTALL: true
+
+jobs:
+    eslint:
+        name: Code quality
+        runs-on: ubuntu-18.04
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - name: Restore node_modules cache
+              uses: actions/cache@v2
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+            - name: Install packages
+              run: yarn
+            - name: ESLint
+              run: yarn eslint
+
+    tests:
+        name: Unit tests
+        runs-on: ubuntu-18.04
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - name: Restore node_modules cache
+              uses: actions/cache@v2
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+            - name: Install packages
+              run: yarn
+            - name: All tests
+              run: yarn test
+            - name: Add coverage comment
+              continue-on-error: true
+              uses: ScaCap/code-coverage-assistant@master
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  lcov-file: ./lcov.info
+
+    build:
+        name: Check build is committed
+        runs-on: ubuntu-18.04
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v2
+            - name: Setup node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - name: Restore node_modules cache
+              uses: actions/cache@v2
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+            - name: Install packages
+              run: yarn
+            - name: Build
+              run: yarn build
+            - name: Ensure that the committed dist matches the build
+              run: git diff-index --quiet HEAD -- ./dist/main.js
