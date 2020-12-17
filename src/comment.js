@@ -2,13 +2,28 @@ import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
-export function commentForMonorepo(lcovArrayForMonorepo, options) {
+export function commentForMonorepo(
+	lcovArrayForMonorepo,
+	lcovBaseArrayForMonorepo,
+	options,
+) {
 	const html = lcovArrayForMonorepo.map(lcovObj => {
+		const pbefore = percentage(
+			lcovBaseArrayForMonorepo.find(
+				el => el.packageName === lcovObj.packageName,
+			).lcov,
+		);
+		const pafter = percentage(lcovObj.lcov);
+		const pdiff = pafter - pbefore;
+		const plus = pdiff > 0 ? "+" : "";
+		const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
+
 		return `${table(
 			tbody(
 				tr(
 					th(lcovObj.packageName),
 					th(percentage(lcovObj.lcov).toFixed(2), "%"),
+					th(arrow, " ", plus, pdiff.toFixed(2), "%"),
 				),
 			),
 		)} \n\n ${details(
@@ -63,10 +78,11 @@ export function diffForMonorepo(
 	lcovBaseArrayForMonorepo,
 	options,
 ) {
-	if (!lcovBaseArrayForMonorepo.length) {
-		return commentForMonorepo(lcovArrayForMonorepo, options);
-	}
-
+	return commentForMonorepo(
+		lcovArrayForMonorepo,
+		lcovBaseArrayForMonorepo,
+		options,
+	);
 	// const pbefore = percentage(before);
 	// const pafter = percentage(lcov);
 	// const pdiff = pafter - pbefore;
