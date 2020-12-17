@@ -10,6 +10,7 @@ module.exports = {
         "default-case": "off",
         eqeqeq: ["error", "always"],
         "func-style": ["error", "expression"],
+        "func-names": ["error"],
         "generator-star-spacing": ["error", { before: false, after: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "max-depth": ["error", 10],
@@ -57,7 +58,7 @@ module.exports = {
         "import/default": "error",
         "import/exports-last": "error",
         "import/extensions": [
-            "warn",
+            "error",
             "always",
             {
                 js: "never",
