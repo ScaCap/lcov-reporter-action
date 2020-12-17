@@ -57,7 +57,7 @@ async function main() {
 	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core.getInput("lcov-base");
 	// Add base path for monorepo
-	const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
+	const monorepoBasePath = core.getInput("monorepo-base-path");
 
 	const raw = await promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {

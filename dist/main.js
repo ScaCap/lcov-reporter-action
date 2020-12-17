@@ -5907,6 +5907,12 @@ function uncovered(file, options) {
 		.join(", ");
 }
 
+/**
+ * Github comment for monorepo
+ * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
+ * @param {{Array<{packageName, lcovBasePath}>}} lcovBaseArrayForMonorepo
+ * @param {*} options
+ */
 function commentForMonorepo(
 	lcovArrayForMonorepo,
 	lcovBaseArrayForMonorepo,
@@ -5946,41 +5952,44 @@ function commentForMonorepo(
 	);
 }
 
-function comment(lcov, options) {
-	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		table(tbody(tr(th(percentage(lcov).toFixed(2), "%")))),
-		"\n\n",
-		details(summary("Coverage Report"), tabulate(lcov, options)),
-	);
-}
-
-function diff(lcov, before, options) {
-	if (!before) {
-		return comment(lcov, options);
-	}
-
-	const pbefore = percentage(before);
-	const pafter = percentage(lcov);
+/**
+ * Github comment for single repo
+ * @param {raw lcov} lcov
+ * @param {*} options
+ */
+function comment(lcov, before, options) {
+	const pbefore = before ? percentage(before) : 0;
+	const pafter = before ? percentage(lcov) : 0;
 	const pdiff = pafter - pbefore;
 	const plus = pdiff > 0 ? "+" : "";
 	const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
 
+	const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
+
 	return fragment(
 		`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-		table(
-			tbody(
-				tr(
-					th(pafter.toFixed(2), "%"),
-					th(arrow, " ", plus, pdiff.toFixed(2), "%"),
-				),
-			),
-		),
+		table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
 	);
 }
 
+/**
+ * Diff in coverage percentage for single repo
+ * @param {raw lcov} lcov
+ * @param {raw base lcov} before
+ * @param {*} options
+ */
+function diff(lcov, before, options) {
+	return comment(lcov, before, options);
+}
+
+/**
+ * Diff in coverage percentage for monorepo
+ * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
+ * @param {{Array<{packageName, lcovBasePath}>}} lcovBaseArrayForMonorepo
+ * @param {*} options
+ */
 function diffForMonorepo(
 	lcovArrayForMonorepo,
 	lcovBaseArrayForMonorepo,
@@ -5991,25 +6000,6 @@ function diffForMonorepo(
 		lcovBaseArrayForMonorepo,
 		options,
 	);
-	// const pbefore = percentage(before);
-	// const pafter = percentage(lcov);
-	// const pdiff = pafter - pbefore;
-	// const plus = pdiff > 0 ? "+" : "";
-	// const arrow = pdiff === 0 ? "" : pdiff < 0 ? "▾" : "▴";
-
-	// return fragment(
-	// 	`Coverage after merging ${b(options.head)} into ${b(options.base)}`,
-	// 	table(
-	// 		tbody(
-	// 			tr(
-	// 				th(pafter.toFixed(2), "%"),
-	// 				th(arrow, " ", plus, pdiff.toFixed(2), "%"),
-	// 			),
-	// 		),
-	// 	),
-	// 	"\n\n",
-	// 	details(summary("Coverage Report"), tabulate(lcov, options)),
-	// );
 }
 
 // Modified from: https://github.com/slavcodev/coverage-monitor-action
@@ -6147,7 +6137,7 @@ async function main() {
 	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
 	const baseFile = core$1.getInput("lcov-base");
 	// Add base path for monorepo
-	const monorepoBasePath = core$1.getInput("monorepo-base-path") || "./packages";
+	const monorepoBasePath = core$1.getInput("monorepo-base-path");
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
 	if (!raw) {
