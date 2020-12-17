@@ -51,7 +51,6 @@ jobs:
             - name: All tests
               run: yarn test
             - name: Add coverage comment
-              continue-on-error: true
               uses: ScaCap/code-coverage-assistant@master
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
