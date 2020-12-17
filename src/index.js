@@ -68,7 +68,8 @@ async function main() {
 	}
 
 	const baseRaw =
-		baseFile && (await promises.readFile(baseFile, "utf-8").catch(err => null));
+		baseFile &&
+		(await promises.readFile(baseFile, "utf-8").catch(err => null));
 	if (!monorepoBasePath && baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}

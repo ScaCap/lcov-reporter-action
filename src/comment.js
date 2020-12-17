@@ -62,7 +62,9 @@ export function comment(lcov, before, options) {
 	const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
 
 	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(options.base)} <p></p>`,
+		`Coverage after merging ${b(options.head)} into ${b(
+			options.base,
+		)} <p></p>`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),

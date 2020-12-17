@@ -5795,7 +5795,8 @@ function tag(name) {
 						.join("")
 				: "";
 
-		const c = typeof children[0] === "string" ? children : children.slice(1);
+		const c =
+			typeof children[0] === "string" ? children : children.slice(1);
 
 		return `<${name}${props}>${c.join("")}</${name}>`;
 	};
@@ -5967,7 +5968,9 @@ function comment(lcov, before, options) {
 	const pdiffHtml = before ? th(arrow, " ", plus, pdiff.toFixed(2), "%") : "";
 
 	return fragment(
-		`Coverage after merging ${b(options.head)} into ${b(options.base)} <p></p>`,
+		`Coverage after merging ${b(options.head)} into ${b(
+			options.base,
+		)} <p></p>`,
 		table(tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml))),
 		"\n\n",
 		details(summary("Coverage Report"), tabulate(lcov, options)),
@@ -6148,7 +6151,8 @@ async function main() {
 	}
 
 	const baseRaw =
-		baseFile && (await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
+		baseFile &&
+		(await fs.promises.readFile(baseFile, "utf-8").catch(err => null));
 	if (!monorepoBasePath && baseFile && !baseRaw) {
 		console.log(`No coverage report found at '${baseFile}', ignoring...`);
 	}

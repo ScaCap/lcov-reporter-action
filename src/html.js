@@ -7,7 +7,8 @@ function tag(name) {
 						.join("")
 				: "";
 
-		const c = typeof children[0] === "string" ? children : children.slice(1);
+		const c =
+			typeof children[0] === "string" ? children : children.slice(1);
 
 		return `<${name}${props}>${c.join("")}</${name}>`;
 	};
