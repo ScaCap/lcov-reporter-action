@@ -66,6 +66,36 @@ with:
 
 ![](/assets/example_diff.png)
 
+## Development
+
+### Contributing
+
+Contributions are encouraged! Fork this repo and open a pull request.
+
+### Commands
+
+command | description
+- | - 
+`test`    | Run the unit tests
+`eslint`  | Run eslint on all applicable files
+`format`  | Run prettier on all applicable files
+`build`   | build the dist file. You are required to run this locally in order to build the dist before opening a PR. 
+
+### Releasing
+
+This action follows [semantic versioning](https://semver.org/).
+
+#### Creating a release
+
+- Ensure master is up to date with all the changes for the next release
+- In the [GitHub releases page](https://github.com/ScaCap/code-coverage-assistant/releases), click "draft a new release"
+  - Choose a tag matching this pattern: `vX.X.X`
+  - Choose `master` as the target 
+  - Use the exact tag as the release title
+  - Write a description containing all the changes since the last release, and detailing any breaking changes
+  - Choose "Publish Release"
+- Github will create the release and add the appropriate tag
+
 ## Acknowledgements
 
 The initial code is based on [romeovs/lcov-reporter-action](https://github.com/romeovs/lcov-reporter-action).
