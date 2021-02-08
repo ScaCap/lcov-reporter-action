@@ -1,3 +1,4 @@
+import path from "path";
 import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
@@ -41,6 +42,10 @@ const commentForMonorepo = (
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
+        const pkgOptions = {
+            ...options,
+            basePath: path.join(options.basePath, lcovObj.packageName),
+        };
 
         const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
         const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
@@ -83,7 +88,7 @@ const commentForMonorepo = (
             ),
         )} \n\n ${details(
             summary("Coverage Report"),
-            tabulate(report, options),
+            tabulate(report, pkgOptions),
         )} <br/>`;
     });
 
