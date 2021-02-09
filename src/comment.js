@@ -9,7 +9,7 @@ import { tabulate } from "./tabulate";
  */
 const renderEmoji = pdiff => {
     if (pdiff.toFixed(2) < 0) return "🔴";
-    return "🟢";
+    return "✅";
 };
 
 /**

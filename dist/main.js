@@ -6031,7 +6031,7 @@ function uncovered(file, options) {
  */
 const renderEmoji = pdiff => {
     if (pdiff.toFixed(2) < 0) return "🔴";
-    return "🟢";
+    return "✅";
 };
 
 /**
