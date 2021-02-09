@@ -6030,8 +6030,8 @@ function uncovered(file, options) {
  * @returns {string} emoji string for negative/positive pdiff
  */
 const renderEmoji = pdiff => {
-    if (pdiff < 0) return "🔴";
-    if (pdiff >= 0) return "🟢";
+    if (pdiff.toFixed(2) < 0) return "🔴";
+    return "🟢";
 };
 
 /**
@@ -6366,7 +6366,7 @@ async function main() {
                   lcovBaseArrayForMonorepo,
                   options,
               ),
-				hiddenHeader: appName ? `<!-- ${appName}-jest-reporter-action -->` : `<!-- monorepo-jest-reporter-action -->`
+				hiddenHeader: appName ? `<!-- ${appName}-code-coverage-assistant -->` : `<!-- monorepo-code-coverage-assistant -->`
     });
 }
 

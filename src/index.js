@@ -129,7 +129,7 @@ async function main() {
                   lcovBaseArrayForMonorepo,
                   options,
               ),
-				hiddenHeader: appName ? `<!-- ${appName}-jest-reporter-action -->` : `<!-- monorepo-jest-reporter-action -->`
+				hiddenHeader: appName ? `<!-- ${appName}-code-coverage-assistant -->` : `<!-- monorepo-code-coverage-assistant -->`
     });
 }
 
