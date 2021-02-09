@@ -6030,7 +6030,7 @@ function uncovered(file, options) {
  * @returns {string} emoji string for negative/positive pdiff
  */
 const renderEmoji = pdiff => {
-    if (pdiff.toFixed(2) < 0) return "🔴";
+    if (pdiff.toFixed(2) < 0) return "❌";
     return "✅";
 };
 
