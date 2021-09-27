@@ -41,6 +41,8 @@ const commentForMonorepo = (
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
+        console.log("baseLcov", baseLcov);
+        console.log("lcovArrayForMonorepo", lcovArrayForMonorepo);
 
         const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
         const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
