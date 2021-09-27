@@ -6344,6 +6344,8 @@ const main = async () => {
         console.log(`No coverage report found at '${baseFile}', ignoring...`);
     }
 
+    console.log("baseRaw", baseRaw);
+
     const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
     const lcovBaseArray = monorepoBasePath
         ? getLcovBaseFiles(monorepoBasePath)
