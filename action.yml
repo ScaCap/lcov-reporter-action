@@ -1,6 +1,6 @@
 name: Code Coverage Report
 description: Comments a pull request with the code coverage for mono repo and single repo
-author: 'Eesh Tyagi, Marina, John Hannagan'
+author: 'Arcblock, Tyagi, Marina, John Hannagan'
 branding:
   icon: check-square
   color: green

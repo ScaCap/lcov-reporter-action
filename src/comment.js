@@ -1,6 +1,6 @@
 import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
-import { tabulate } from "./tabulate";
+import { codelate } from "./codelate";
 
 /**
  * Compares two arrays of objects and returns with unique lines update
@@ -37,59 +37,77 @@ const commentForMonorepo = (
     options,
 ) => {
     const { base } = options;
-    const html = lcovArrayForMonorepo.map(lcovObj => {
-        const baseLcov = lcovBaseArrayForMonorepo.find(
-            el => el.packageName === lcovObj.packageName,
-        );
+    const getHtml = (showDetail = true) =>
+        lcovArrayForMonorepo.map(lcovObj => {
+            const baseLcov = lcovBaseArrayForMonorepo.find(
+                el => el.packageName === lcovObj.packageName,
+            );
 
-        const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
-        const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-        const pdiff = pafter - pbefore;
-        const plus = pdiff > 0 ? "+" : "";
+            const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
+            const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
+            const pdiff = pafter - pbefore;
+            const plus = pdiff > 0 ? "+" : "";
 
-        let arrow = "";
-        if (pdiff < 0) {
-            arrow = "▾";
-        } else if (pdiff > 0) {
-            arrow = "▴";
-        }
+            let arrow = "";
+            if (pdiff < 0) {
+                arrow = "▾";
+            } else if (pdiff > 0) {
+                arrow = "▴";
+            }
 
-        const pdiffHtml = baseLcov
-            ? th(
-                  renderEmoji(pdiff),
-                  " ",
-                  arrow,
-                  " ",
-                  plus,
-                  pdiff.toFixed(2),
-                  "%",
-              )
-            : "";
-        let report = lcovObj.lcov;
+            const pdiffHtml = baseLcov
+                ? th(
+                      renderEmoji(pdiff),
+                      " ",
+                      arrow,
+                      " ",
+                      plus,
+                      pdiff.toFixed(2),
+                      "%",
+                  )
+                : "";
+            let report = lcovObj.lcov;
 
-        if (baseLcov) {
-            const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov));
-            const onlyInBefore = baseLcov.filter(comparer(lcovObj.lcov));
-            report = onlyInBefore.concat(onlyInLcov);
-        }
+            if (baseLcov) {
+                const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov));
+                const onlyInBefore = baseLcov.filter(comparer(lcovObj.lcov));
+                report = onlyInBefore.concat(onlyInLcov);
+            }
 
-        return `${table(
-            tbody(
-                tr(
-                    th(lcovObj.packageName),
-                    th(percentage(lcovObj.lcov).toFixed(2), "%"),
-                    pdiffHtml,
+            return `${table(
+                tbody(
+                    tr(
+                        th(lcovObj.packageName),
+                        th(percentage(lcovObj.lcov).toFixed(2), "%"),
+                        pdiffHtml,
+                    ),
                 ),
-            ),
-        )} \n\n ${details(
-            summary("Coverage Report"),
-            tabulate(report, options),
-        )} <br/>`;
-    });
+            )} \n\n ${
+                showDetail
+                    ? `${details(
+                          summary("Detail"),
+                          codelate(report, options),
+                      )}<br/>`
+                    : ""
+            }`;
+        });
 
     const title = `Coverage after merging into ${b(base)} <p></p>`;
 
-    return fragment(title, html.join(""));
+    let res = fragment(title, getHtml().join(""));
+
+    const maxinum = 65536;
+    if (res.length <= maxinum) {
+        return res;
+    }
+
+    res = fragment(
+        title,
+        getHtml(false).join(""),
+        `No details are displayed because the detail info exceeds ${maxinum} characters<p></p>`,
+    );
+
+    return res;
 };
 
 /**
@@ -134,7 +152,7 @@ const comment = (lcov, before, options) => {
         title,
         table(header),
         "\n\n",
-        details(summary("Coverage Report"), tabulate(report, options)),
+        details(summary("Detail"), codelate(report, options)),
     );
 };
 

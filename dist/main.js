@@ -5918,23 +5918,25 @@ const tag = name => (...children) => {
 const details = tag("details");
 const summary = tag("summary");
 const tr = tag("tr");
-const td = tag("td");
 const th = tag("th");
 const b = tag("b");
 const table = tag("table");
 const tbody = tag("tbody");
-const a = tag("a");
+const pre = tag("pre");
 
 const fragment = (...children) => children.join("");
 
-const filename = (file, indent, options) => {
+const makeRow = (...strings) =>
+    `${strings
+        .map((str, index) => (`${str}` || "").padEnd(index === 0 ? 30 : 9))
+        .join("| ")}\n`;
+
+const filename = (file, options) => {
     const relative = file.file.replace(options.prefix, "");
-    const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
     const parts = relative.split("/");
     const last = parts[parts.length - 1];
-    const space = indent ? "&nbsp; &nbsp;" : "";
 
-    return fragment(space, a({ href }, last));
+    return last;
 };
 
 const percentage$1 = item => {
@@ -5945,39 +5947,15 @@ const percentage$1 = item => {
     const value = item.found === 0 ? 100 : (item.hit / item.found) * 100;
     const rounded = value.toFixed(2).replace(/\.0*$/u, "");
 
-    const tag = value === 100 ? fragment : b;
-
-    return tag(`${rounded}%`);
+    return `${rounded}%`;
 };
 
-const uncovered = (file, options) => {
-    const branches = (file.branches ? file.branches.details : [])
-        .filter(branch => branch.taken === 0)
-        .map(branch => branch.line);
-
-    const lines = (file.lines ? file.lines.details : [])
-        .filter(line => line.hit === 0)
-        .map(line => line.line);
-
-    const all = [...branches, ...lines].sort();
-
-    return all
-        .map(line => {
-            const relative = file.file.replace(options.prefix, "");
-            const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
-
-            return a({ href }, line);
-        })
-        .join(", ");
-};
-
-const toRow = (file, indent, options) =>
-    tr(
-        td(filename(file, indent, options)),
-        td(percentage$1(file.branches)),
-        td(percentage$1(file.functions)),
-        td(percentage$1(file.lines)),
-        td(uncovered(file, options)),
+const toRow = (file, options) =>
+    makeRow(
+        filename(file, options),
+        percentage$1(file.branches),
+        percentage$1(file.functions),
+        percentage$1(file.lines),
     );
 
 const toFolder = path => {
@@ -5985,18 +5963,12 @@ const toFolder = path => {
         return "";
     }
 
-    return tr(td({ colspan: 5 }, b(path)));
+    return `[${path}]\n`;
 };
 
-// Tabulate the lcov data in a HTML table.
-const tabulate = (lcov, options) => {
-    const head = tr(
-        th("File"),
-        th("Branches"),
-        th("Funcs"),
-        th("Lines"),
-        th("Uncovered Lines"),
-    );
+// Display the lcov data in a code table.
+const codelate = (lcov, options) => {
+    const head = makeRow("File", "Branches", "Funcs", "Lines");
 
     const folders = {};
     for (const file of lcov) {
@@ -6012,12 +5984,12 @@ const tabulate = (lcov, options) => {
             (acc, key) => [
                 ...acc,
                 toFolder(key),
-                ...folders[key].map(file => toRow(file, key !== "", options)),
+                ...folders[key].map(file => toRow(file, options)),
             ],
             [],
         );
 
-    return table(tbody(head, ...rows));
+    return pre([head, ...rows].join(""));
 };
 
 /**
@@ -6055,59 +6027,77 @@ const commentForMonorepo = (
     options,
 ) => {
     const { base } = options;
-    const html = lcovArrayForMonorepo.map(lcovObj => {
-        const baseLcov = lcovBaseArrayForMonorepo.find(
-            el => el.packageName === lcovObj.packageName,
-        );
+    const getHtml = (showDetail = true) =>
+        lcovArrayForMonorepo.map(lcovObj => {
+            const baseLcov = lcovBaseArrayForMonorepo.find(
+                el => el.packageName === lcovObj.packageName,
+            );
 
-        const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
-        const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-        const pdiff = pafter - pbefore;
-        const plus = pdiff > 0 ? "+" : "";
+            const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
+            const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
+            const pdiff = pafter - pbefore;
+            const plus = pdiff > 0 ? "+" : "";
 
-        let arrow = "";
-        if (pdiff < 0) {
-            arrow = "▾";
-        } else if (pdiff > 0) {
-            arrow = "▴";
-        }
+            let arrow = "";
+            if (pdiff < 0) {
+                arrow = "▾";
+            } else if (pdiff > 0) {
+                arrow = "▴";
+            }
 
-        const pdiffHtml = baseLcov
-            ? th(
-                  renderEmoji(pdiff),
-                  " ",
-                  arrow,
-                  " ",
-                  plus,
-                  pdiff.toFixed(2),
-                  "%",
-              )
-            : "";
-        let report = lcovObj.lcov;
+            const pdiffHtml = baseLcov
+                ? th(
+                      renderEmoji(pdiff),
+                      " ",
+                      arrow,
+                      " ",
+                      plus,
+                      pdiff.toFixed(2),
+                      "%",
+                  )
+                : "";
+            let report = lcovObj.lcov;
 
-        if (baseLcov) {
-            const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov));
-            const onlyInBefore = baseLcov.filter(comparer(lcovObj.lcov));
-            report = onlyInBefore.concat(onlyInLcov);
-        }
+            if (baseLcov) {
+                const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov));
+                const onlyInBefore = baseLcov.filter(comparer(lcovObj.lcov));
+                report = onlyInBefore.concat(onlyInLcov);
+            }
 
-        return `${table(
-            tbody(
-                tr(
-                    th(lcovObj.packageName),
-                    th(percentage(lcovObj.lcov).toFixed(2), "%"),
-                    pdiffHtml,
+            return `${table(
+                tbody(
+                    tr(
+                        th(lcovObj.packageName),
+                        th(percentage(lcovObj.lcov).toFixed(2), "%"),
+                        pdiffHtml,
+                    ),
                 ),
-            ),
-        )} \n\n ${details(
-            summary("Coverage Report"),
-            tabulate(report, options),
-        )} <br/>`;
-    });
+            )} \n\n ${
+                showDetail
+                    ? `${details(
+                          summary("Detail"),
+                          codelate(report, options),
+                      )}<br/>`
+                    : ""
+            }`;
+        });
 
     const title = `Coverage after merging into ${b(base)} <p></p>`;
 
-    return fragment(title, html.join(""));
+    let res = fragment(title, getHtml().join(""));
+
+    const maxinum = 65536;
+    if (res.length <= maxinum) {
+        return res;
+    }
+
+    res = fragment(
+        title,
+        getHtml(false).join(""),
+        `No details are displayed because the detail info exceeds ${maxinum} characters<p></p>`,
+    );
+
+    return res;
 };
 
 /**
@@ -6152,7 +6142,7 @@ const comment = (lcov, before, options) => {
         title,
         table(header),
         "\n\n",
-        details(summary("Coverage Report"), tabulate(report, options)),
+        details(summary("Detail"), codelate(report, options)),
     );
 };
 
@@ -6271,20 +6261,28 @@ const upsertComment = async ({
 /**
  * Find all files inside a dir, recursively.
  * @function getLcovFiles
- * @param  {string} dir Dir path string.
+ * @param  {string|Array} inputDir Dir path.
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
  */
-const getLcovFiles = (dir, filelist) => {
+const getLcovFiles = (inputDir, filelist, depth = 0) => {
+    const dirArray = Array.isArray(inputDir) ? inputDir : [inputDir];
     let fileArray = filelist || [];
-    fs__default.readdirSync(dir).forEach(file => {
-        fileArray = fs__default.statSync(path.join(dir, file)).isDirectory()
-            ? getLcovFiles(path.join(dir, file), fileArray)
-            : fileArray
-                  .filter(f => f.path.includes("lcov.info"))
-                  .concat({
-                      name: dir.split("/")[1],
-                      path: path.join(dir, file),
-                  });
+    dirArray.forEach(dir => {
+        fs__default.readdirSync(dir).forEach(file => {
+            if (
+                fs__default.statSync(path.join(dir, file)).isDirectory() &&
+                (file === "coverage" || depth === 0)
+            ) {
+                fileArray = getLcovFiles(path.join(dir, file), fileArray, depth+1);
+            } else if (file === "lcov.info") {
+                fileArray = fileArray
+                    .concat({
+                        name: `${dir.split("/")[0]}/${dir.split("/")[1]}`,
+                        path: path.join(dir, file),
+                    })
+                    .filter(f => f.path.includes("lcov.info"));
+            }
+        });
     });
 
     return fileArray;
@@ -6293,25 +6291,34 @@ const getLcovFiles = (dir, filelist) => {
 /**
  * Find all files inside a dir, recursively for base branch.
  * @function getLcovBaseFiles
- * @param  {string} dir Dir path string.
+ * @param  {string|array} inputDir Dir path.
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
  */
-const getLcovBaseFiles = (dir, filelist) => {
+const getLcovBaseFiles = (inputDir, filelist, depth) => {
+    const dirArray = Array.isArray(inputDir) ? inputDir : [inputDir];
     let fileArray = filelist || [];
-    fs__default.readdirSync(dir).forEach(file => {
-        fileArray = fs__default.statSync(path.join(dir, file)).isDirectory()
-            ? getLcovBaseFiles(path.join(dir, file), fileArray)
-            : fileArray
-                  .filter(f => f.path.includes("lcov-base.info"))
-                  .concat({
-                      name: dir.split("/")[1],
-                      path: path.join(dir, file),
-                  });
+    dirArray.forEach(dir => {
+        fs__default.readdirSync(dir).forEach(file => {
+            if (
+                fs__default.statSync(path.join(dir, file)).isDirectory() &&
+                (file === "coverage" || depth === 0)
+            ) {
+                fileArray = getLcovBaseFiles(path.join(dir, file), fileArray, depth + 1);
+            } else if (file === "lcov-base.info") {
+                fileArray = fileArray
+                    .concat({
+                        name: `${dir.split("/")[0]}/${dir.split("/")[1]}`,
+                        path: path.join(dir, file),
+                    })
+                    .filter(f => f.path.includes("lcov.info"));
+            }
+        });
     });
 
     return fileArray;
 };
 
+// eslint-disable-next-line complexity
 const main = async () => {
     const { context = {} } = github$1 || {};
 
@@ -6320,7 +6327,10 @@ const main = async () => {
     const baseFile = core$1.getInput("lcov-base");
     const appName = core$1.getInput("app-name");
     // Add base path for monorepo
-    const monorepoBasePath = core$1.getInput("monorepo-base-path");
+    let monorepoBasePath = core$1.getInput("monorepo-base-path");
+    if (monorepoBasePath && typeof monorepoBasePath === "string") {
+        monorepoBasePath = monorepoBasePath.split(",");
+    }
 
     const raw =
         !monorepoBasePath &&
@@ -6342,7 +6352,9 @@ const main = async () => {
         console.log(`No coverage report found at '${baseFile}', ignoring...`);
     }
 
+    console.log("monorepoBasePath:", monorepoBasePath);
     const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
+    console.log("lcovArray:", lcovArray);
     const lcovBaseArray = monorepoBasePath
         ? getLcovBaseFiles(monorepoBasePath)
         : [];

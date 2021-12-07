@@ -21,5 +21,6 @@ export const table = tag("table");
 export const tbody = tag("tbody");
 export const a = tag("a");
 export const span = tag("span");
+export const pre = tag("pre");
 
 export const fragment = (...children) => children.join("");
