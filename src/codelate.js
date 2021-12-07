@@ -1,4 +1,4 @@
-import { pre } from "./html";
+import { pre, code } from "./html";
 
 const makeRow = (...strings) =>
     `${strings
@@ -63,5 +63,5 @@ export const codelate = (lcov, options) => {
             [],
         );
 
-    return pre([head, ...rows].join(""));
+    return pre(code([head, ...rows].join("")));
 };

@@ -24,3 +24,22 @@ export const percentage = lcovData => {
 
     return (hit / found) * 100;
 };
+
+export const lineCov = lcovData => {
+    let hit = 0;
+    let found = 0;
+    const arr = Array.isArray(lcovData[0]) ? lcovData : [lcovData];
+
+    for (const item of arr) {
+        for (const entry of item) {
+            hit += entry.lines.hit;
+            found += entry.lines.found;
+        }
+    }
+
+    return {
+        hit,
+        found,
+        percentage: (hit / found) * 100,
+    };
+};

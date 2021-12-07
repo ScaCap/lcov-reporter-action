@@ -1,5 +1,17 @@
-import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
-import { percentage } from "./lcov";
+import {
+    details,
+    summary,
+    b,
+    fragment,
+    table,
+    tbody,
+    tr,
+    th,
+    h2,
+    ul,
+    li,
+} from "./html";
+import { percentage, lineCov } from "./lcov";
 import { codelate } from "./codelate";
 
 /**
@@ -25,6 +37,16 @@ const comparer = otherArray => current =>
             other.lines.hit === current.lines.hit,
     ).length === 0;
 
+const packageCovHtml = (tagFn, lcovObj) => {
+    const { hit, found, percentage: percent } = lineCov(lcovObj.lcov);
+
+    return tagFn(
+        `${lcovObj.packageName}: `,
+        `${percent.toFixed(2)}% `,
+        `( ${hit} / ${found} )`,
+    );
+};
+
 /**
  * Github comment for monorepo
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
@@ -42,30 +64,6 @@ const commentForMonorepo = (
             const baseLcov = lcovBaseArrayForMonorepo.find(
                 el => el.packageName === lcovObj.packageName,
             );
-
-            const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
-            const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-            const pdiff = pafter - pbefore;
-            const plus = pdiff > 0 ? "+" : "";
-
-            let arrow = "";
-            if (pdiff < 0) {
-                arrow = "▾";
-            } else if (pdiff > 0) {
-                arrow = "▴";
-            }
-
-            const pdiffHtml = baseLcov
-                ? th(
-                      renderEmoji(pdiff),
-                      " ",
-                      arrow,
-                      " ",
-                      plus,
-                      pdiff.toFixed(2),
-                      "%",
-                  )
-                : "";
             let report = lcovObj.lcov;
 
             if (baseLcov) {
@@ -74,25 +72,28 @@ const commentForMonorepo = (
                 report = onlyInBefore.concat(onlyInLcov);
             }
 
-            return `${table(
-                tbody(
-                    tr(
-                        th(lcovObj.packageName),
-                        th(percentage(lcovObj.lcov).toFixed(2), "%"),
-                        pdiffHtml,
-                    ),
-                ),
-            )} \n\n ${
-                showDetail
-                    ? `${details(
-                          summary("Detail"),
-                          codelate(report, options),
-                      )}<br/>`
-                    : ""
-            }`;
+            if (showDetail) {
+                return `${details(
+                    packageCovHtml(summary, lcovObj),
+                    codelate(report, options),
+                )}`;
+            }
+
+            return `${ul(packageCovHtml(li, lcovObj))}`;
         });
 
-    const title = `Coverage after merging into ${b(base)} <p></p>`;
+    const lineCovResult = lineCov(lcovArrayForMonorepo.map(x => x.lcov));
+    const lineCovResultStr = `${lineCovResult.percentage
+        .toFixed(2)
+        .replace(/\.0*$/u, "")}% ( ${lineCovResult.hit} / ${
+        lineCovResult.found
+    } )`;
+    const title = h2(
+        `Coverage after merging into ${b(base)}`,
+        "<br><br>",
+        lineCovResultStr,
+        "<br><br>",
+    );
 
     let res = fragment(title, getHtml().join(""));
 

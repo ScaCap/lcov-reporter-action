@@ -22,5 +22,9 @@ export const tbody = tag("tbody");
 export const a = tag("a");
 export const span = tag("span");
 export const pre = tag("pre");
+export const code = tag("code");
+export const h2 = tag("h2");
+export const ul = tag("ul");
+export const li = tag("li");
 
 export const fragment = (...children) => children.join("");

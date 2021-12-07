@@ -5902,6 +5902,25 @@ const percentage = lcovData => {
     return (hit / found) * 100;
 };
 
+const lineCov = lcovData => {
+    let hit = 0;
+    let found = 0;
+    const arr = Array.isArray(lcovData[0]) ? lcovData : [lcovData];
+
+    for (const item of arr) {
+        for (const entry of item) {
+            hit += entry.lines.hit;
+            found += entry.lines.found;
+        }
+    }
+
+    return {
+        hit,
+        found,
+        percentage: (hit / found) * 100,
+    };
+};
+
 const tag = name => (...children) => {
     const props =
         typeof children[0] === "object"
@@ -5923,6 +5942,10 @@ const b = tag("b");
 const table = tag("table");
 const tbody = tag("tbody");
 const pre = tag("pre");
+const code = tag("code");
+const h2 = tag("h2");
+const ul = tag("ul");
+const li = tag("li");
 
 const fragment = (...children) => children.join("");
 
@@ -5989,7 +6012,7 @@ const codelate = (lcov, options) => {
             [],
         );
 
-    return pre([head, ...rows].join(""));
+    return pre(code([head, ...rows].join("")));
 };
 
 /**
@@ -6015,6 +6038,16 @@ const comparer = otherArray => current =>
             other.lines.hit === current.lines.hit,
     ).length === 0;
 
+const packageCovHtml = (tagFn, lcovObj) => {
+    const { hit, found, percentage: percent } = lineCov(lcovObj.lcov);
+
+    return tagFn(
+        `${lcovObj.packageName}: `,
+        `${percent.toFixed(2)}% `,
+        `( ${hit} / ${found} )`,
+    );
+};
+
 /**
  * Github comment for monorepo
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
@@ -6032,30 +6065,6 @@ const commentForMonorepo = (
             const baseLcov = lcovBaseArrayForMonorepo.find(
                 el => el.packageName === lcovObj.packageName,
             );
-
-            const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
-            const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
-            const pdiff = pafter - pbefore;
-            const plus = pdiff > 0 ? "+" : "";
-
-            let arrow = "";
-            if (pdiff < 0) {
-                arrow = "▾";
-            } else if (pdiff > 0) {
-                arrow = "▴";
-            }
-
-            const pdiffHtml = baseLcov
-                ? th(
-                      renderEmoji(pdiff),
-                      " ",
-                      arrow,
-                      " ",
-                      plus,
-                      pdiff.toFixed(2),
-                      "%",
-                  )
-                : "";
             let report = lcovObj.lcov;
 
             if (baseLcov) {
@@ -6064,25 +6073,28 @@ const commentForMonorepo = (
                 report = onlyInBefore.concat(onlyInLcov);
             }
 
-            return `${table(
-                tbody(
-                    tr(
-                        th(lcovObj.packageName),
-                        th(percentage(lcovObj.lcov).toFixed(2), "%"),
-                        pdiffHtml,
-                    ),
-                ),
-            )} \n\n ${
-                showDetail
-                    ? `${details(
-                          summary("Detail"),
-                          codelate(report, options),
-                      )}<br/>`
-                    : ""
-            }`;
+            if (showDetail) {
+                return `${details(
+                    packageCovHtml(summary, lcovObj),
+                    codelate(report, options),
+                )}`;
+            }
+
+            return `${ul(packageCovHtml(li, lcovObj))}`;
         });
 
-    const title = `Coverage after merging into ${b(base)} <p></p>`;
+    const lineCovResult = lineCov(lcovArrayForMonorepo.map(x => x.lcov));
+    const lineCovResultStr = `${lineCovResult.percentage
+        .toFixed(2)
+        .replace(/\.0*$/u, "")}% ( ${lineCovResult.hit} / ${
+        lineCovResult.found
+    } )`;
+    const title = h2(
+        `Coverage after merging into ${b(base)}`,
+        "<br><br>",
+        lineCovResultStr,
+        "<br><br>",
+    );
 
     let res = fragment(title, getHtml().join(""));
 
@@ -6273,7 +6285,11 @@ const getLcovFiles = (inputDir, filelist, depth = 0) => {
                 fs__default.statSync(path.join(dir, file)).isDirectory() &&
                 (file === "coverage" || depth === 0)
             ) {
-                fileArray = getLcovFiles(path.join(dir, file), fileArray, depth+1);
+                fileArray = getLcovFiles(
+                    path.join(dir, file),
+                    fileArray,
+                    depth + 1,
+                );
             } else if (file === "lcov.info") {
                 fileArray = fileArray
                     .concat({
@@ -6303,7 +6319,11 @@ const getLcovBaseFiles = (inputDir, filelist, depth) => {
                 fs__default.statSync(path.join(dir, file)).isDirectory() &&
                 (file === "coverage" || depth === 0)
             ) {
-                fileArray = getLcovBaseFiles(path.join(dir, file), fileArray, depth + 1);
+                fileArray = getLcovBaseFiles(
+                    path.join(dir, file),
+                    fileArray,
+                    depth + 1,
+                );
             } else if (file === "lcov-base.info") {
                 fileArray = fileArray
                     .concat({
