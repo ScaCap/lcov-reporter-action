@@ -6380,8 +6380,6 @@ const main = async () => {
         appName,
     };
 
-    console.log(context.payload, "context.payload");
-
     const lcov = !monorepoBasePath && (await parse$1(raw));
     const baselcov = baseRaw && (await parse$1(baseRaw));
 
