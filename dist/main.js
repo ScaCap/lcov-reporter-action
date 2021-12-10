@@ -6416,10 +6416,9 @@ const main = async () => {
     const lcovArrayForMonorepo = monorepoBasePath
         ? await toLcovForMonorepo(getLcovFiles(monorepoBasePath))
         : [];
-    const lcovBaseArrayForMonorepo =
-        baseFile && monorepoBasePath
-            ? await toLcovForMonorepo(getLcovBaseFiles(monorepoBasePath))
-            : [];
+    const lcovBaseArrayForMonorepo = monorepoBasePath
+        ? await toLcovForMonorepo(getLcovBaseFiles(monorepoBasePath))
+        : [];
 
     const options = {
         repository: context.payload.repository.full_name,
