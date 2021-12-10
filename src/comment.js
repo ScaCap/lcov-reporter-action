@@ -68,6 +68,7 @@ const commentForMonorepo = (
         let report = lcovObj.lcov;
 
         if (baseLcov) {
+            console.log(baseLcov, "baseLcov on comment compare");
             const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov));
             const onlyInBefore = baseLcov.filter(comparer(lcovObj.lcov));
             report = onlyInBefore.concat(onlyInLcov);
