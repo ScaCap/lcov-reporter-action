@@ -6297,8 +6297,6 @@ const getLcovFiles = (dir, filelist) => {
                   });
     });
 
-    if (fileArray.length) console.log(fileArray, "fileArray in getLcovFiles");
-
     return fileArray;
 };
 
@@ -6334,9 +6332,6 @@ const prepareFilesForMonorepo = lcovFiles =>
             .map(async lcovFile => {
                 const readFile = await fs.promises.readFile(lcovFile.path, "utf8");
                 const data = await parse$1(readFile);
-
-                console.log(lcovFile.name, "name in prepareFilesForMonorepo");
-                console.log(data, "data in prepareFilesForMonorepo");
 
                 return {
                     packageName: lcovFile.name,
@@ -6390,6 +6385,8 @@ const main = async () => {
         baseFile && monorepoBasePath
             ? await prepareFilesForMonorepo(getLcovBaseFiles(monorepoBasePath))
             : [];
+
+    console.log(lcovBaseArrayForMonorepo, "lcovBaseArrayForMonorepo");
     // const lcovArrayForMonorepo = [];
     //   const lcovBaseArrayForMonorepo = [];
     //   for (const file of lcovArray) {
