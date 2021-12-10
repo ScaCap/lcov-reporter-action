@@ -1,11 +1,20 @@
+import Path from "path";
 import { th, tr, td, table, tbody, a, b, fragment } from "./html";
 
 const filename = (file, indent, options) => {
-    const relative = file.file.replace(options.prefix, "");
-    const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
+    const relative = Path.join(
+        options.commit.substring(0, 7),
+        file.file.includes(options.basePath) ? "" : options.basePath,
+        file.file.replace(options.workspace, ""),
+    );
+    const href = `/${options.repository}/blob/${relative}`;
     const parts = relative.split("/");
     const last = parts[parts.length - 1];
     const space = indent ? "&nbsp; &nbsp;" : "";
+
+    if (options.condense) {
+        return last;
+    }
 
     return fragment(space, a({ href }, last));
 };
@@ -24,6 +33,10 @@ const percentage = item => {
 };
 
 const uncovered = (file, options) => {
+    if (options.condense) {
+        return "*";
+    }
+
     const branches = (file.branches ? file.branches.details : [])
         .filter(branch => branch.taken === 0)
         .map(branch => branch.line);
@@ -36,8 +49,12 @@ const uncovered = (file, options) => {
 
     return all
         .map(line => {
-            const relative = file.file.replace(options.prefix, "");
-            const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
+            const relative = Path.join(
+                options.commit.substring(0, 7),
+                file.file.includes(options.basePath) ? "" : options.basePath,
+                file.file.replace(options.workspace, ""),
+            );
+            const href = `/${options.repository}/blob/${relative}#L${line}`;
 
             return a({ href }, line);
         })
@@ -73,7 +90,7 @@ export const tabulate = (lcov, options) => {
 
     const folders = {};
     for (const file of lcov) {
-        const parts = file.file.replace(options.prefix, "").split("/");
+        const parts = file.file.replace(options.workspace, "").split("/");
         const folder = parts.slice(0, -1).join("/");
         folders[folder] = folders[folder] || [];
         folders[folder].push(file);
