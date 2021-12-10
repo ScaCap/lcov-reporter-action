@@ -7,7 +7,7 @@ import { diff } from "./comment";
 const main = async () => {
     const file = process.argv[2];
     const beforeFile = process.argv[3];
-    const prefix = `${path.dirname(path.dirname(path.resolve(file)))}/`;
+    const workspace = `${path.dirname(path.dirname(path.resolve(file)))}/`;
 
     const content = await fs.readFile(file, "utf-8");
     const lcov = await parse(content);
@@ -21,7 +21,8 @@ const main = async () => {
     const options = {
         repository: "example/foo",
         commit: "f9d42291812ed03bb197e48050ac38ac6befe4e5",
-        prefix,
+        workspace,
+        basePath: "",
         head: "feat/test",
         base: "master",
     };

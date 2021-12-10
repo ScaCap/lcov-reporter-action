@@ -1,6 +1,10 @@
+import path from "path";
 import { details, summary, b, fragment, table, tbody, tr, th } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
+
+// Don't linkify lines if over this number since GitHub only allows 65536 characters per comment
+const MAX_LINES = 600;
 
 /**
  * Compares two arrays of objects and returns with unique lines update
@@ -25,6 +29,24 @@ const comparer = otherArray => current =>
             other.lines.hit === current.lines.hit,
     ).length === 0;
 
+const countLines = lcovArray =>
+    lcovArray.reduce(
+        (total, lcovObj) =>
+            total +
+            lcovObj.lcov.reduce((pkgTotal, file) => {
+                const branches = (file.branches ? file.branches.details : [])
+                    .filter(branch => branch.taken === 0)
+                    .map(branch => branch.line);
+
+                const lines = (file.lines ? file.lines.details : [])
+                    .filter(line => line.hit === 0)
+                    .map(line => line.line);
+
+                return pkgTotal + [...branches, ...lines].length;
+            }, 0),
+        0,
+    );
+
 /**
  * Github comment for monorepo
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
@@ -36,13 +58,18 @@ const commentForMonorepo = (
     lcovBaseArrayForMonorepo,
     options,
 ) => {
+    const condense =
+        options.condense || countLines(lcovArrayForMonorepo) > MAX_LINES;
     const { base } = options;
     const html = lcovArrayForMonorepo.map(lcovObj => {
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
-        console.log("baseLcov", baseLcov);
-        console.log("lcovArrayForMonorepo", lcovArrayForMonorepo);
+        const pkgOptions = {
+            ...options,
+            basePath: path.join(options.basePath, lcovObj.packageName),
+            condense,
+        };
 
         const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
         const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
@@ -85,13 +112,17 @@ const commentForMonorepo = (
             ),
         )} \n\n ${details(
             summary("Coverage Report"),
-            tabulate(report, options),
+            tabulate(report, pkgOptions),
         )} <br/>`;
     });
 
     const title = `Coverage after merging into ${b(base)} <p></p>`;
 
-    return fragment(title, html.join(""));
+    return fragment(
+        title,
+        html.join(""),
+        condense ? "<small>*Condensed for GitHub comment max</small>" : "",
+    );
 };
 
 /**
@@ -131,12 +162,17 @@ const comment = (lcov, before, options) => {
               tr(th(appName), th(percentage(lcov).toFixed(2), "%"), pdiffHtml),
           )
         : tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml));
+    const condense = options.condense || countLines([lcov]) > MAX_LINES;
+    const opt = { ...options, condense };
 
     return fragment(
         title,
         table(header),
         "\n\n",
-        details(summary("Coverage Report"), tabulate(report, options)),
+        details(summary("Coverage Report"), tabulate(report, opt)),
+        condense
+            ? "<br /><small>*Condensed for GitHub comment max</small>"
+            : "",
     );
 };
 
