@@ -38,6 +38,7 @@ const commentForMonorepo = (
 ) => {
     const { base } = options;
     const html = lcovArrayForMonorepo.map(lcovObj => {
+        console.log(lcovBaseArrayForMonorepo, "lcovBaseArrayForMonorepo");
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
