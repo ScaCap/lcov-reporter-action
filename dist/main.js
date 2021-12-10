@@ -5928,11 +5928,19 @@ const a = tag("a");
 const fragment = (...children) => children.join("");
 
 const filename = (file, indent, options) => {
-    const relative = file.file.replace(options.prefix, "");
-    const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
+    const relative = path.join(
+        options.commit.substring(0, 7),
+        file.file.includes(options.basePath) ? "" : options.basePath,
+        file.file.replace(options.workspace, ""),
+    );
+    const href = `/${options.repository}/blob/${relative}`;
     const parts = relative.split("/");
     const last = parts[parts.length - 1];
     const space = indent ? "&nbsp; &nbsp;" : "";
+
+    if (options.condense) {
+        return last;
+    }
 
     return fragment(space, a({ href }, last));
 };
@@ -5951,6 +5959,10 @@ const percentage$1 = item => {
 };
 
 const uncovered = (file, options) => {
+    if (options.condense) {
+        return "*";
+    }
+
     const branches = (file.branches ? file.branches.details : [])
         .filter(branch => branch.taken === 0)
         .map(branch => branch.line);
@@ -5963,8 +5975,12 @@ const uncovered = (file, options) => {
 
     return all
         .map(line => {
-            const relative = file.file.replace(options.prefix, "");
-            const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
+            const relative = path.join(
+                options.commit.substring(0, 7),
+                file.file.includes(options.basePath) ? "" : options.basePath,
+                file.file.replace(options.workspace, ""),
+            );
+            const href = `/${options.repository}/blob/${relative}#L${line}`;
 
             return a({ href }, line);
         })
@@ -6000,7 +6016,7 @@ const tabulate = (lcov, options) => {
 
     const folders = {};
     for (const file of lcov) {
-        const parts = file.file.replace(options.prefix, "").split("/");
+        const parts = file.file.replace(options.workspace, "").split("/");
         const folder = parts.slice(0, -1).join("/");
         folders[folder] = folders[folder] || [];
         folders[folder].push(file);
@@ -6019,6 +6035,9 @@ const tabulate = (lcov, options) => {
 
     return table(tbody(head, ...rows));
 };
+
+// Don't linkify lines if over this number since GitHub only allows 65536 characters per comment
+const MAX_LINES = 600;
 
 /**
  * Compares two arrays of objects and returns with unique lines update
@@ -6043,6 +6062,24 @@ const comparer = otherArray => current =>
             other.lines.hit === current.lines.hit,
     ).length === 0;
 
+const countLines = lcovArray =>
+    lcovArray.reduce(
+        (total, lcovObj) =>
+            total +
+            lcovObj.lcov.reduce((pkgTotal, file) => {
+                const branches = (file.branches ? file.branches.details : [])
+                    .filter(branch => branch.taken === 0)
+                    .map(branch => branch.line);
+
+                const lines = (file.lines ? file.lines.details : [])
+                    .filter(line => line.hit === 0)
+                    .map(line => line.line);
+
+                return pkgTotal + [...branches, ...lines].length;
+            }, 0),
+        0,
+    );
+
 /**
  * Github comment for monorepo
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
@@ -6054,21 +6091,18 @@ const commentForMonorepo = (
     lcovBaseArrayForMonorepo,
     options,
 ) => {
+    const condense =
+        options.condense || countLines(lcovArrayForMonorepo) > MAX_LINES;
     const { base } = options;
-    console.log(
-        lcovBaseArrayForMonorepo,
-        "lcovBaseArrayForMonorepo commentForMonorepo",
-    );
-    console.log(
-        lcovArrayForMonorepo,
-        "lcovArrayForMonorepo commentForMonorepo",
-    );
     const html = lcovArrayForMonorepo.map(lcovObj => {
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
-        console.log("baseLcov", baseLcov);
-        console.log("lcovArrayForMonorepo", lcovArrayForMonorepo);
+        const pkgOptions = {
+            ...options,
+            basePath: path.join(options.basePath, lcovObj.packageName),
+            condense,
+        };
 
         const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;
         const pafter = baseLcov ? percentage(lcovObj.lcov) : 0;
@@ -6111,13 +6145,17 @@ const commentForMonorepo = (
             ),
         )} \n\n ${details(
             summary("Coverage Report"),
-            tabulate(report, options),
+            tabulate(report, pkgOptions),
         )} <br/>`;
     });
 
     const title = `Coverage after merging into ${b(base)} <p></p>`;
 
-    return fragment(title, html.join(""));
+    return fragment(
+        title,
+        html.join(""),
+        condense ? "<small>*Condensed for GitHub comment max</small>" : "",
+    );
 };
 
 /**
@@ -6157,12 +6195,17 @@ const comment = (lcov, before, options) => {
               tr(th(appName), th(percentage(lcov).toFixed(2), "%"), pdiffHtml),
           )
         : tbody(tr(th(percentage(lcov).toFixed(2), "%"), pdiffHtml));
+    const condense = options.condense || countLines([lcov]) > MAX_LINES;
+    const opt = { ...options, condense };
 
     return fragment(
         title,
         table(header),
         "\n\n",
-        details(summary("Coverage Report"), tabulate(report, options)),
+        details(summary("Coverage Report"), tabulate(report, opt)),
+        condense
+            ? "<br /><small>*Condensed for GitHub comment max</small>"
+            : "",
     );
 };
 
@@ -6318,23 +6361,20 @@ const getLcovBaseFiles = (dir, filelist) => {
                       path: path.join(dir, file),
                   });
     });
-    if (fileArray.length) {
-        console.log(fileArray, "fileArray in getLcovFiles base");
-    }
 
     return fileArray;
 };
 
-const prepareFilesForMonorepo = lcovFiles =>
+const toLcovForMonorepo = lcovFiles =>
     Promise.all(
         lcovFiles
-            .filter(lcovFile => lcovFile.path.includes(".info"))
-            .map(async lcovFile => {
-                const readFile = await fs.promises.readFile(lcovFile.path, "utf8");
-                const data = await parse$1(readFile);
+            .filter(file => file.path.includes(".info"))
+            .map(async file => {
+                const rLcove = await fs.promises.readFile(file.path, "utf8");
+                const data = await parse$1(rLcove);
 
                 return {
-                    packageName: lcovFile.name,
+                    packageName: file.name,
                     lcov: data,
                 };
             }),
@@ -6370,55 +6410,23 @@ const main = async () => {
         console.log(`No coverage report found at '${baseFile}', ignoring...`);
     }
 
-    console.log("baseFile", baseFile);
-
-    // const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
-    // const lcovBaseArray = monorepoBasePath
-    //     ? getLcovBaseFiles(monorepoBasePath)
-    //     : [];
-
     const lcovArrayForMonorepo = monorepoBasePath
-        ? await prepareFilesForMonorepo(getLcovFiles(monorepoBasePath))
+        ? await toLcovForMonorepo(getLcovFiles(monorepoBasePath))
         : [];
-
     const lcovBaseArrayForMonorepo =
         baseFile && monorepoBasePath
-            ? await prepareFilesForMonorepo(getLcovBaseFiles(monorepoBasePath))
+            ? await toLcovForMonorepo(getLcovBaseFiles(monorepoBasePath))
             : [];
-
-    console.log(lcovBaseArrayForMonorepo, "lcovBaseArrayForMonorepo");
-    // const lcovArrayForMonorepo = [];
-    //   const lcovBaseArrayForMonorepo = [];
-    //   for (const file of lcovArray) {
-    //       if (file.path.includes(".info")) {
-    //           const rLcove = await promises.readFile(file.path, "utf8");
-    //           const data = await parse(rLcove);
-    //           lcovArrayForMonorepo.push({
-    //               packageName: file.name,
-    //               lcov: data,
-    //           });
-    //       }
-    //   }
-
-    // for (const file of lcovBaseArray) {
-    //     if (file.path.includes(".info")) {
-    //         const rLcovBase = await promises.readFile(file.path, "utf8");
-    //         const data = await parse(rLcovBase);
-    //         lcovBaseArrayForMonorepo.push({
-    //             packageName: file.name,
-    //             lcov: data,
-    //         });
-    //     }
-    // }
 
     const options = {
         repository: context.payload.repository.full_name,
         commit: context.payload.pull_request.head.sha,
-        prefix: `${process.env.GITHUB_WORKSPACE}/`,
+        workspace: `${process.env.GITHUB_WORKSPACE}/`,
         basePath: monorepoBasePath || "",
         head: context.payload.pull_request.head.ref,
         base: context.payload.pull_request.base.ref,
         appName,
+        condense: false,
     };
 
     const lcov = !monorepoBasePath && (await parse$1(raw));
