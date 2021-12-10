@@ -38,7 +38,6 @@ const commentForMonorepo = (
 ) => {
     const { base } = options;
     const html = lcovArrayForMonorepo.map(lcovObj => {
-        console.log(lcovBaseArrayForMonorepo, "lcovBaseArrayForMonorepo");
         const baseLcov = lcovBaseArrayForMonorepo.find(
             el => el.packageName === lcovObj.packageName,
         );
@@ -69,7 +68,6 @@ const commentForMonorepo = (
         let report = lcovObj.lcov;
 
         if (baseLcov) {
-            console.log(baseLcov, "baseLcov on comment compare");
             const onlyInLcov = lcovObj.lcov.filter(comparer(baseLcov.lcov));
             const onlyInBefore = baseLcov.lcov.filter(comparer(lcovObj.lcov));
             report = onlyInBefore.concat(onlyInLcov);
