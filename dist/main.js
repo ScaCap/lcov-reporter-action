@@ -6300,11 +6300,14 @@ const getLcovFiles = (dir, filelist) => {
  */
 const getLcovBaseFiles = (dir, filelist) => {
     let fileArray = filelist || [];
+    console.log(filelist, "filelist");
+    console.log(dir, "dir");
     fs__default.readdirSync(dir).forEach(file => {
+        console.log(file, "file");
         fileArray = fs__default.statSync(path.join(dir, file)).isDirectory()
             ? getLcovBaseFiles(path.join(dir, file), fileArray)
             : fileArray
-                  .filter(f => f.path.includes("lcov-base.info"))
+                  .filter(f => f.path.includes("lcov-base"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path.join(dir, file),
