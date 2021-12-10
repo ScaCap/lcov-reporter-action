@@ -25,6 +25,8 @@ const getLcovFiles = (dir, filelist) => {
                   });
     });
 
+    if (fileArray.length) console.log(fileArray, "fileArray in getLcovFiles");
+
     return fileArray;
 };
 
@@ -46,9 +48,30 @@ const getLcovBaseFiles = (dir, filelist) => {
                       path: path.join(dir, file),
                   });
     });
+    if (fileArray.length) {
+        console.log(fileArray, "fileArray in getLcovFiles base");
+    }
 
     return fileArray;
 };
+
+const prepareFilesForMonorepo = lcovFiles =>
+    Promise.all(
+        lcovFiles
+            .filter(lcovFile => lcovFile.path.includes(".info"))
+            .map(async lcovFile => {
+                const readFile = await promises.readFile(lcovFile.path, "utf8");
+                const data = await parse(readFile);
+
+                console.log(lcovFile.name, "name in prepareFilesForMonorepo");
+                console.log(data, "data in prepareFilesForMonorepo");
+
+                return {
+                    packageName: lcovFile.name,
+                    lcov: data,
+                };
+            }),
+    );
 
 const main = async () => {
     const { context = {} } = github || {};
@@ -82,39 +105,48 @@ const main = async () => {
 
     console.log("baseFile", baseFile);
 
-    const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
-    const lcovBaseArray = monorepoBasePath
-        ? getLcovBaseFiles(monorepoBasePath)
+    // const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
+    // const lcovBaseArray = monorepoBasePath
+    //     ? getLcovBaseFiles(monorepoBasePath)
+    //     : [];
+
+    const lcovArrayForMonorepo = monorepoBasePath
+        ? await prepareFilesForMonorepo(getLcovFiles(monorepoBasePath))
         : [];
 
-    const lcovArrayForMonorepo = [];
-    const lcovBaseArrayForMonorepo = [];
-    for (const file of lcovArray) {
-        if (file.path.includes(".info")) {
-            const rLcove = await promises.readFile(file.path, "utf8");
-            const data = await parse(rLcove);
-            lcovArrayForMonorepo.push({
-                packageName: file.name,
-                lcov: data,
-            });
-        }
-    }
+    const lcovBaseArrayForMonorepo =
+        baseFile && monorepoBasePath
+            ? await prepareFilesForMonorepo(getLcovBaseFiles(monorepoBasePath))
+            : [];
+    // const lcovArrayForMonorepo = [];
+    //   const lcovBaseArrayForMonorepo = [];
+    //   for (const file of lcovArray) {
+    //       if (file.path.includes(".info")) {
+    //           const rLcove = await promises.readFile(file.path, "utf8");
+    //           const data = await parse(rLcove);
+    //           lcovArrayForMonorepo.push({
+    //               packageName: file.name,
+    //               lcov: data,
+    //           });
+    //       }
+    //   }
 
-    for (const file of lcovBaseArray) {
-        if (file.path.includes(".info")) {
-            const rLcovBase = await promises.readFile(file.path, "utf8");
-            const data = await parse(rLcovBase);
-            lcovBaseArrayForMonorepo.push({
-                packageName: file.name,
-                lcov: data,
-            });
-        }
-    }
+    // for (const file of lcovBaseArray) {
+    //     if (file.path.includes(".info")) {
+    //         const rLcovBase = await promises.readFile(file.path, "utf8");
+    //         const data = await parse(rLcovBase);
+    //         lcovBaseArrayForMonorepo.push({
+    //             packageName: file.name,
+    //             lcov: data,
+    //         });
+    //     }
+    // }
 
     const options = {
         repository: context.payload.repository.full_name,
         commit: context.payload.pull_request.head.sha,
         prefix: `${process.env.GITHUB_WORKSPACE}/`,
+        basePath: monorepoBasePath || "",
         head: context.payload.pull_request.head.ref,
         base: context.payload.pull_request.base.ref,
         appName,
