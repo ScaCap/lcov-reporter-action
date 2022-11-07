@@ -29,7 +29,7 @@ const main = async () => {
     console.log(diff(lcov, before, options));
 };
 
-main().catch(err => {
+main().catch((err) => {
     console.log(err);
     process.exit(1);
 });

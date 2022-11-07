@@ -14,11 +14,11 @@ import { upsertComment } from "./github";
  */
 const getLcovFiles = (dir, filelist) => {
     let fileArray = filelist || [];
-    fs.readdirSync(dir).forEach(file => {
+    fs.readdirSync(dir).forEach((file) => {
         fileArray = fs.statSync(path.join(dir, file)).isDirectory()
             ? getLcovFiles(path.join(dir, file), fileArray)
             : fileArray
-                  .filter(f => f.path.includes("lcov.info"))
+                  .filter((f) => f.path.includes("lcov.info"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path.join(dir, file),
@@ -36,11 +36,11 @@ const getLcovFiles = (dir, filelist) => {
  */
 const getLcovBaseFiles = (dir, filelist) => {
     let fileArray = filelist || [];
-    fs.readdirSync(dir).forEach(file => {
+    fs.readdirSync(dir).forEach((file) => {
         fileArray = fs.statSync(path.join(dir, file)).isDirectory()
             ? getLcovBaseFiles(path.join(dir, file), fileArray)
             : fileArray
-                  .filter(f => f.path.includes("lcov-base.info"))
+                  .filter((f) => f.path.includes("lcov-base.info"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path.join(dir, file),
@@ -64,7 +64,7 @@ const main = async () => {
         !monorepoBasePath &&
         (await promises
             .readFile(lcovFile, "utf-8")
-            .catch(err => console.error(err)));
+            .catch((err) => console.error(err)));
     if (!monorepoBasePath && !raw) {
         console.log(`No coverage report found at '${lcovFile}', exiting...`);
 
@@ -75,7 +75,7 @@ const main = async () => {
         baseFile &&
         (await promises
             .readFile(baseFile, "utf-8")
-            .catch(err => console.error(err)));
+            .catch((err) => console.error(err)));
     if (!monorepoBasePath && baseFile && !baseRaw) {
         console.log(`No coverage report found at '${baseFile}', ignoring...`);
     }
@@ -140,7 +140,7 @@ const main = async () => {
     });
 };
 
-main().catch(err => {
+main().catch((err) => {
     console.log(err);
     core.setFailed(err.message);
 });
