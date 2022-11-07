@@ -9,7 +9,7 @@ env:
 jobs:
     eslint:
         name: Code quality
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout repo
               uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: 12
+                  node-version: 16
             - name: Restore node_modules cache
               uses: actions/cache@v2
               with:
@@ -31,7 +31,7 @@ jobs:
 
     tests:
         name: Unit tests
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout repo
               uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: 12
+                  node-version: 16
             - name: Restore node_modules cache
               uses: actions/cache@v2
               with:
@@ -58,7 +58,7 @@ jobs:
 
     build:
         name: Check build is committed
-        runs-on: ubuntu-18.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout repo
               uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v1
               with:
-                  node-version: 12
+                  node-version: 16
             - name: Restore node_modules cache
               uses: actions/cache@v2
               with:
