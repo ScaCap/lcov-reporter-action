@@ -87597,7 +87597,7 @@ lib.exports = parse$1;
 lib.exports.source = walkFile;
 
 // Parse lcov string into lcov data
-const parse = data =>
+const parse = (data) =>
     new Promise((resolve, reject) => {
         lib.exports(data, (err, res) => {
             if (err) {
@@ -87610,7 +87610,7 @@ const parse = data =>
     });
 
 // Get the total coverage percentage from the lcov data.
-const percentage$1 = lcovData => {
+const percentage$1 = (lcovData) => {
     let hit = 0;
     let found = 0;
     for (const entry of lcovData) {
@@ -87621,18 +87621,21 @@ const percentage$1 = lcovData => {
     return (hit / found) * 100;
 };
 
-const tag = name => (...children) => {
-    const props =
-        typeof children[0] === "object"
-            ? Object.keys(children[0])
-                  .map(key => ` ${key}='${children[0][key]}'`)
-                  .join("")
-            : "";
+const tag =
+    (name) =>
+    (...children) => {
+        const props =
+            typeof children[0] === "object"
+                ? Object.keys(children[0])
+                      .map((key) => ` ${key}='${children[0][key]}'`)
+                      .join("")
+                : "";
 
-    const c = typeof children[0] === "string" ? children : children.slice(1);
+        const c =
+            typeof children[0] === "string" ? children : children.slice(1);
 
-    return `<${name}${props}>${c.join("")}</${name}>`;
-};
+        return `<${name}${props}>${c.join("")}</${name}>`;
+    };
 
 const details = tag("details");
 const summary = tag("summary");
@@ -87656,7 +87659,7 @@ const filename = (file, indent, options) => {
     return fragment(space, a({ href }, last));
 };
 
-const percentage = item => {
+const percentage = (item) => {
     if (!item) {
         return "N/A";
     }
@@ -87671,17 +87674,17 @@ const percentage = item => {
 
 const uncovered = (file, options) => {
     const branches = (file.branches ? file.branches.details : [])
-        .filter(branch => branch.taken === 0)
-        .map(branch => branch.line);
+        .filter((branch) => branch.taken === 0)
+        .map((branch) => branch.line);
 
     const lines = (file.lines ? file.lines.details : [])
-        .filter(line => line.hit === 0)
-        .map(line => line.line);
+        .filter((line) => line.hit === 0)
+        .map((line) => line.line);
 
     const all = [...branches, ...lines].sort();
 
     return all
-        .map(line => {
+        .map((line) => {
             const relative = file.file.replace(options.prefix, "");
             const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
 
@@ -87699,7 +87702,7 @@ const toRow = (file, indent, options) =>
         td(uncovered(file, options)),
     );
 
-const toFolder = path => {
+const toFolder = (path) => {
     if (path === "") {
         return "";
     }
@@ -87731,7 +87734,7 @@ const tabulate = (lcov, options) => {
             (acc, key) => [
                 ...acc,
                 toFolder(key),
-                ...folders[key].map(file => toRow(file, key !== "", options)),
+                ...folders[key].map((file) => toRow(file, key !== "", options)),
             ],
             [],
         );
@@ -87744,7 +87747,7 @@ const tabulate = (lcov, options) => {
  * @param {number} pdiff value from diff percentage
  * @returns {string} emoji string for negative/positive pdiff
  */
-const renderEmoji = pdiff => {
+const renderEmoji = (pdiff) => {
     if (pdiff.toFixed(2) < 0) return "❌";
 
     return "✅";
@@ -87755,9 +87758,9 @@ const renderEmoji = pdiff => {
  * @param {Array} otherArray
  * @returns {Function} function with filtering non original lines
  */
-const comparer = otherArray => current =>
+const comparer = (otherArray) => (current) =>
     otherArray.filter(
-        other =>
+        (other) =>
             other.lines.found === current.lines.found &&
             other.lines.hit === current.lines.hit,
     ).length === 0;
@@ -87774,9 +87777,9 @@ const commentForMonorepo = (
     options,
 ) => {
     const { base } = options;
-    const html = lcovArrayForMonorepo.map(lcovObj => {
+    const html = lcovArrayForMonorepo.map((lcovObj) => {
         const baseLcov = lcovBaseArrayForMonorepo.find(
-            el => el.packageName === lcovObj.packageName,
+            (el) => el.packageName === lcovObj.packageName,
         );
 
         const pbefore = baseLcov ? percentage$1(baseLcov.lcov) : 0;
@@ -87995,11 +87998,11 @@ const upsertComment = async ({
  */
 const getLcovFiles = (dir, filelist) => {
     let fileArray = filelist || [];
-    fs$2.readdirSync(dir).forEach(file => {
+    fs$2.readdirSync(dir).forEach((file) => {
         fileArray = fs$2.statSync(path$1.join(dir, file)).isDirectory()
             ? getLcovFiles(path$1.join(dir, file), fileArray)
             : fileArray
-                  .filter(f => f.path.includes("lcov.info"))
+                  .filter((f) => f.path.includes("lcov.info"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path$1.join(dir, file),
@@ -88017,11 +88020,11 @@ const getLcovFiles = (dir, filelist) => {
  */
 const getLcovBaseFiles = (dir, filelist) => {
     let fileArray = filelist || [];
-    fs$2.readdirSync(dir).forEach(file => {
+    fs$2.readdirSync(dir).forEach((file) => {
         fileArray = fs$2.statSync(path$1.join(dir, file)).isDirectory()
             ? getLcovBaseFiles(path$1.join(dir, file), fileArray)
             : fileArray
-                  .filter(f => f.path.includes("lcov-base.info"))
+                  .filter((f) => f.path.includes("lcov-base.info"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path$1.join(dir, file),
@@ -88045,7 +88048,7 @@ const main = async () => {
         !monorepoBasePath &&
         (await fs$2.promises
             .readFile(lcovFile, "utf-8")
-            .catch(err => console.error(err)));
+            .catch((err) => console.error(err)));
     if (!monorepoBasePath && !raw) {
         console.log(`No coverage report found at '${lcovFile}', exiting...`);
 
@@ -88056,7 +88059,7 @@ const main = async () => {
         baseFile &&
         (await fs$2.promises
             .readFile(baseFile, "utf-8")
-            .catch(err => console.error(err)));
+            .catch((err) => console.error(err)));
     if (!monorepoBasePath && baseFile && !baseRaw) {
         console.log(`No coverage report found at '${baseFile}', ignoring...`);
     }
@@ -88121,7 +88124,7 @@ const main = async () => {
     });
 };
 
-main().catch(err => {
+main().catch((err) => {
     console.log(err);
     core.setFailed(err.message);
 });
