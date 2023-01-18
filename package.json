@@ -11,7 +11,8 @@
         "comment",
         "message"
     ],
-    "main": "index.js",
+    "main": "dist/main.js",
+    "type": "module",
     "scripts": {
         "build": "rollup -c --bundleConfigAsCjs",
         "test": "jest --passWithNoTests --coverage",
