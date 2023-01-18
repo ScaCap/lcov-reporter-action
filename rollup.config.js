@@ -3,7 +3,7 @@ const terser = require("@rollup/plugin-terser");
 const resolve = require("@rollup/plugin-node-resolve");
 const json = require("@rollup/plugin-json");
 const externals = require("rollup-plugin-node-externals");
-const builtins = require("rollup-plugin-node-builtins");
+// const builtins = require("rollup-plugin-node-builtins");
 
 module.exports = {
     input: "src/index.js",
@@ -11,11 +11,26 @@ module.exports = {
         file: "dist/main.js",
         format: "cjs",
     },
-    externals: ["fs"],
+    external: [
+        "fs",
+        "path",
+        "os",
+        "http",
+        "https",
+        "net",
+        "tls",
+        "events",
+        "assert",
+        "util",
+        "url",
+        "stream",
+        "punycode",
+        "zlib",
+    ],
     treeshake: true,
     plugins: [
         terser(),
-        builtins(),
+        // builtins(),
         externals({
             builtin: true,
             deps: false,
