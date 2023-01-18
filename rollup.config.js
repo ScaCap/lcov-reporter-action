@@ -1,6 +1,7 @@
 import commonjs from "@rollup/plugin-commonjs";
 import { terser } from "rollup-plugin-terser";
 import resolve from "@rollup/plugin-node-resolve";
+import nodePolyfills from "rollup-plugin-node-polyfills";
 import json from "@rollup/plugin-json";
 import externals from "rollup-plugin-node-externals";
 
@@ -12,16 +13,17 @@ export default {
     },
     treeshake: true,
     plugins: [
+        commonjs(),
         terser(),
         externals({
             builtin: true,
             deps: false,
         }),
+        nodePolyfills(),
         resolve({
-            preferBuiltins: true,
+            preferBuiltins: false,
             mainFields: ["module", "browser", "main"],
         }),
-        commonjs(),
         json(),
     ],
 };
