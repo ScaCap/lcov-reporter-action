@@ -11,9 +11,9 @@
         "comment",
         "message"
     ],
-    "main": "index.js",
+    "main": "dist/main.js",
     "scripts": {
-        "build": "rollup -c",
+        "build": "parcel build src/index.js",
         "test": "jest --passWithNoTests --coverage",
         "local": "babel-node src/cli",
         "format": "prettier --write src/*.js src/**/*.js *.js",
@@ -24,10 +24,16 @@
         "@actions/core": "^1.2.0",
         "@actions/github": "^5.1.1",
         "@rollup/plugin-terser": "^0.3.0",
+        "@swc/helpers": "^0.4.14",
         "@types/node": "^18.11.18",
         "lcov-parse": "^1.0.0",
+        "parcel": "^2.8.2",
         "rollup-plugin-node-builtins": "^2.1.2"
     },
+    "engines": {
+        "node": "16"
+    },
+    "browserslist": "> 0.25%, not dead",
     "devDependencies": {
         "@babel/core": "^7.20.2",
         "@babel/eslint-parser": "7.19.1",
