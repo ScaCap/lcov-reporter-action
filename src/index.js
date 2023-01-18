@@ -1,4 +1,5 @@
-import fs, { promises } from "fs";
+import fs from "fs";
+import promises from "fs/promises";
 import path from "path";
 import core from "@actions/core";
 import github from "@actions/github";
