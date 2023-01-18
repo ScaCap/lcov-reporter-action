@@ -51,7 +51,7 @@ jobs:
             - name: All tests
               run: yarn test
             - name: Add coverage comment
-              uses: ScaCap/code-coverage-assistant@master
+              uses: ScaCap/code-coverage-assistant@releases/v2
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   lcov-file: ./coverage/lcov.info
