@@ -1,16 +1,17 @@
-import commonjs from "@rollup/plugin-commonjs";
-import { terser } from "rollup-plugin-terser";
-import resolve from "@rollup/plugin-node-resolve";
-import json from "@rollup/plugin-json";
-import externals from "rollup-plugin-node-externals";
-import builtins from "rollup-plugin-node-builtins";
+const commonjs = require("@rollup/plugin-commonjs");
+const terser = require("@rollup/plugin-terser");
+const resolve = require("@rollup/plugin-node-resolve");
+const json = require("@rollup/plugin-json");
+const externals = require("rollup-plugin-node-externals");
+const builtins = require("rollup-plugin-node-builtins");
 
-export default {
+module.exports = {
     input: "src/index.js",
     output: {
         file: "dist/main.js",
         format: "cjs",
     },
+    externals: ["fs"],
     treeshake: true,
     plugins: [
         terser(),
