@@ -1,5 +1,5 @@
-import fs, { promises } from "node:fs";
-import path from "node:path";
+import fs, { promises } from "fs";
+import path from "path";
 import core from "@actions/core";
 import github from "@actions/github";
 import { parse } from "./lcov";
