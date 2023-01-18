@@ -18,7 +18,6 @@ export default {
             deps: false,
         }),
         resolve({
-            preferBuiltins: true,
             mainFields: ["module", "browser", "main"],
         }),
         commonjs(),
