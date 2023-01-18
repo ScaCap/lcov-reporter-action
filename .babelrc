@@ -1,0 +1,7 @@
+{
+    "comments": true, // preserve JS comments at compilation time
+    "compact": false, // All optional newlines and whitespace will be omitted when generating code in compact mode.
+    "retainLines": false, // preserve lines if cannot user source maps 
+    "minified": false, // omits block-end semicolons, omits () from new Foo() when possible, and may output shorter versions of literals.
+    "presets": ["@babel/preset-env"] // compile for each environment that supports ES5
+}

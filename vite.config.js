@@ -20,6 +20,11 @@ export default defineConfig({
         },
     },
     rollupOptions: {
+        input: "src/index.js",
+        output: {
+            file: "dist/main.js",
+            format: "cjs",
+        },
         plugins: [
             terser(),
             externals({
