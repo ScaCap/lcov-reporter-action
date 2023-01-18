@@ -25,6 +25,8 @@
         "@actions/github": "^5.1.1",
         "@types/lcov-parse": "^1.0.0",
         "lcov-parse": "^1.0.0",
+        "rollup-plugin-node-builtins": "^2.1.2",
+        "rollup-plugin-node-globals": "^1.4.0",
         "rollup-plugin-node-polyfills": "^0.2.1"
     },
     "devDependencies": {
