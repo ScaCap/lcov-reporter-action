@@ -1,6 +1,6 @@
 import fs, { promises } from "fs";
 import path from "path";
-import core from "@actions/core";
+import * as core from "@actions/core";
 import github from "@actions/github";
 import { parse } from "./lcov";
 import { diff, diffForMonorepo } from "./comment";

@@ -11729,7 +11729,6 @@ var external_path_ = __nccwpck_require__(1017);
 var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
 var github_default = /*#__PURE__*/__nccwpck_require__.n(github);
@@ -12200,12 +12199,12 @@ const getLcovBaseFiles = (dir, filelist) => {
 const main = async () => {
     const { context = {} } = (github_default()) || {};
 
-    const token = core_default().getInput("github-token");
-    const lcovFile = core_default().getInput("lcov-file") || "./coverage/lcov.info";
-    const baseFile = core_default().getInput("lcov-base");
-    const appName = core_default().getInput("app-name");
+    const token = core.getInput("github-token");
+    const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
+    const baseFile = core.getInput("lcov-base");
+    const appName = core.getInput("app-name");
     // Add base path for monorepo
-    const monorepoBasePath = core_default().getInput("monorepo-base-path");
+    const monorepoBasePath = core.getInput("monorepo-base-path");
 
     const raw =
         !monorepoBasePath &&
@@ -12287,7 +12286,7 @@ const main = async () => {
 
 main().catch((err) => {
     console.log(err);
-    core_default().setFailed(err.message);
+    core.setFailed(err.message);
 });
 
 })();
