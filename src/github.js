@@ -15,10 +15,11 @@
 const appendHiddenHeaderToComment = (body, hiddenHeader) => hiddenHeader + body;
 
 const listComments = async ({ client, context, prNumber, hiddenHeader }) => {
-    const { data: existingComments } = await client.issues.listComments({
-        ...context.repo,
-        issue_number: prNumber,
-    });
+    const { data: existingComments } =
+        (await client.issues?.listComments({
+            ...context.repo,
+            issue_number: prNumber,
+        })) ?? {};
 
     return existingComments.filter(({ body }) => body.startsWith(hiddenHeader));
 };
