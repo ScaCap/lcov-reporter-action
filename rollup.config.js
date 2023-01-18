@@ -11,7 +11,7 @@ export default {
         format: "cjs",
     },
     treeshake: true,
-    external: ["fs"],
+    external: ["fs", "path"],
     plugins: [
         terser(),
         externals({
