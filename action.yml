@@ -1,25 +1,25 @@
 name: Code Coverage Report
 description: Comments a pull request with the code coverage for mono repo and single repo
-author: 'Eesh Tyagi, Marina, John Hannagan'
+author: "Eesh Tyagi, Marina, John Hannagan"
 branding:
-  icon: check-square
-  color: green
+    icon: check-square
+    color: green
 inputs:
-  github-token:
-    description: Github token
-    required: true
-  monorepo-base-path:
-    description: Location of your monorepo `packages` parent folder. If this is specified then we don't need `lcov-file` and `lcov-base` params
-    required: false
-  lcov-file:
-    description: The location of the lcov.info file. Applicable for single repo setup.
-    required: false
-  lcov-base:
-    description: The location of the lcov file for the base branch. Applicable for single repo setup.
-    required: false
-  app-name:
-    description: App name to display on comment
-    required: false
+    github-token:
+        description: Github token
+        required: true
+    monorepo-base-path:
+        description: Location of your monorepo `packages` parent folder. If this is specified then we don't need `lcov-file` and `lcov-base` params
+        required: false
+    lcov-file:
+        description: The location of the lcov.info file. Applicable for single repo setup.
+        required: false
+    lcov-base:
+        description: The location of the lcov file for the base branch. Applicable for single repo setup.
+        required: false
+    app-name:
+        description: App name to display on comment
+        required: false
 runs:
-  using: node12
-  main: dist/main.js
+    using: node12
+    main: dist/main.js

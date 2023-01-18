@@ -7,7 +7,7 @@ import { tabulate } from "./tabulate";
  * @param {number} pdiff value from diff percentage
  * @returns {string} emoji string for negative/positive pdiff
  */
-const renderEmoji = pdiff => {
+const renderEmoji = (pdiff) => {
     if (pdiff.toFixed(2) < 0) return "❌";
 
     return "✅";
@@ -18,9 +18,9 @@ const renderEmoji = pdiff => {
  * @param {Array} otherArray
  * @returns {Function} function with filtering non original lines
  */
-const comparer = otherArray => current =>
+const comparer = (otherArray) => (current) =>
     otherArray.filter(
-        other =>
+        (other) =>
             other.lines.found === current.lines.found &&
             other.lines.hit === current.lines.hit,
     ).length === 0;
@@ -37,9 +37,9 @@ const commentForMonorepo = (
     options,
 ) => {
     const { base } = options;
-    const html = lcovArrayForMonorepo.map(lcovObj => {
+    const html = lcovArrayForMonorepo.map((lcovObj) => {
         const baseLcov = lcovBaseArrayForMonorepo.find(
-            el => el.packageName === lcovObj.packageName,
+            (el) => el.packageName === lcovObj.packageName,
         );
 
         const pbefore = baseLcov ? percentage(baseLcov.lcov) : 0;

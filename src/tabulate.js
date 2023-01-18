@@ -10,7 +10,7 @@ const filename = (file, indent, options) => {
     return fragment(space, a({ href }, last));
 };
 
-const percentage = item => {
+const percentage = (item) => {
     if (!item) {
         return "N/A";
     }
@@ -25,17 +25,17 @@ const percentage = item => {
 
 const uncovered = (file, options) => {
     const branches = (file.branches ? file.branches.details : [])
-        .filter(branch => branch.taken === 0)
-        .map(branch => branch.line);
+        .filter((branch) => branch.taken === 0)
+        .map((branch) => branch.line);
 
     const lines = (file.lines ? file.lines.details : [])
-        .filter(line => line.hit === 0)
-        .map(line => line.line);
+        .filter((line) => line.hit === 0)
+        .map((line) => line.line);
 
     const all = [...branches, ...lines].sort();
 
     return all
-        .map(line => {
+        .map((line) => {
             const relative = file.file.replace(options.prefix, "");
             const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#L${line}`;
 
@@ -53,7 +53,7 @@ const toRow = (file, indent, options) =>
         td(uncovered(file, options)),
     );
 
-const toFolder = path => {
+const toFolder = (path) => {
     if (path === "") {
         return "";
     }
@@ -85,7 +85,7 @@ export const tabulate = (lcov, options) => {
             (acc, key) => [
                 ...acc,
                 toFolder(key, options),
-                ...folders[key].map(file => toRow(file, key !== "", options)),
+                ...folders[key].map((file) => toRow(file, key !== "", options)),
             ],
             [],
         );
