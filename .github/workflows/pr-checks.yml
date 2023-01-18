@@ -41,11 +41,6 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: 16
-            - name: Restore node_modules cache
-              uses: actions/cache@v2
-              with:
-                  path: "**/node_modules"
-                  key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
             - name: Install packages
               run: yarn
             - name: Build
@@ -53,7 +48,7 @@ jobs:
             - name: All tests
               run: yarn test
             - name: Add coverage comment
-              uses: ScaCap/code-coverage-assistant@master
+              uses: ScaCap/code-coverage-assistant@fix_tests
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   lcov-file: ./coverage/lcov.info
