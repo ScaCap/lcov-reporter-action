@@ -1,13 +1,13 @@
-var $70OUV$swchelperslib_async_to_generatorjs = require("@swc/helpers/lib/_async_to_generator.js");
-var $70OUV$swchelperslib_ts_generatorjs = require("@swc/helpers/lib/_ts_generator.js");
-var $70OUV$fs = require("fs");
-var $70OUV$path = require("path");
-var $70OUV$actionscore = require("@actions/core");
-var $70OUV$actionsgithub = require("@actions/github");
-var $70OUV$lcovparse = require("lcov-parse");
-var $70OUV$swchelperslib_to_consumable_arrayjs = require("@swc/helpers/lib/_to_consumable_array.js");
-var $70OUV$swchelperslib_object_spreadjs = require("@swc/helpers/lib/_object_spread.js");
-var $70OUV$swchelperslib_object_spread_propsjs = require("@swc/helpers/lib/_object_spread_props.js");
+var $8v44x$swchelperslib_async_to_generatorjs = require("@swc/helpers/lib/_async_to_generator.js");
+var $8v44x$swchelperslib_ts_generatorjs = require("@swc/helpers/lib/_ts_generator.js");
+var $8v44x$fs = require("fs");
+var $8v44x$path = require("path");
+var $8v44x$actionscore = require("@actions/core");
+var $8v44x$actionsgithub = require("@actions/github");
+var $8v44x$lcovparse = require("lcov-parse");
+var $8v44x$swchelperslib_to_consumable_arrayjs = require("@swc/helpers/lib/_to_consumable_array.js");
+var $8v44x$swchelperslib_object_spreadjs = require("@swc/helpers/lib/_object_spread.js");
+var $8v44x$swchelperslib_object_spread_propsjs = require("@swc/helpers/lib/_object_spread_props.js");
 
 function $parcel$interopDefault(a) {
   return a && a.__esModule ? a.default : a;
@@ -19,9 +19,9 @@ function $parcel$interopDefault(a) {
 
 
 
-var $4972ce6f03c7f1c7$export$98e6a39c04603d36 = function(data) {
+var $688e957b405e23ce$export$98e6a39c04603d36 = function(data) {
     return new Promise(function(resolve, reject) {
-        (0, ($parcel$interopDefault($70OUV$lcovparse)))(data, function(err, res) {
+        (0, ($parcel$interopDefault($8v44x$lcovparse)))(data, function(err, res) {
             if (err) {
                 reject(err);
                 return;
@@ -30,7 +30,7 @@ var $4972ce6f03c7f1c7$export$98e6a39c04603d36 = function(data) {
         });
     });
 };
-var $4972ce6f03c7f1c7$export$a3560dfa62c7efe0 = function(lcovData) {
+var $688e957b405e23ce$export$a3560dfa62c7efe0 = function(lcovData) {
     var hit = 0;
     var found = 0;
     var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
@@ -58,7 +58,7 @@ var $4972ce6f03c7f1c7$export$a3560dfa62c7efe0 = function(lcovData) {
 };
 
 
-var $167d3d2ca4cb5316$var$tag = function(name) {
+var $01bb812f4aef4969$var$tag = function(name) {
     return function() {
         for(var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++){
             children[_key] = arguments[_key];
@@ -70,17 +70,17 @@ var $167d3d2ca4cb5316$var$tag = function(name) {
         return "<".concat(name).concat(props, ">").concat(c.join(""), "</").concat(name, ">");
     };
 };
-var $167d3d2ca4cb5316$export$41ee12f6f6f05843 = $167d3d2ca4cb5316$var$tag("details");
-var $167d3d2ca4cb5316$export$9a2dbef7a17e2e58 = $167d3d2ca4cb5316$var$tag("summary");
-var $167d3d2ca4cb5316$export$72451b88a72ad9c2 = $167d3d2ca4cb5316$var$tag("tr");
-var $167d3d2ca4cb5316$export$2beef8af2014e5c6 = $167d3d2ca4cb5316$var$tag("td");
-var $167d3d2ca4cb5316$export$d657bc098992a431 = $167d3d2ca4cb5316$var$tag("th");
-var $167d3d2ca4cb5316$export$8b22cf2602fb60ce = $167d3d2ca4cb5316$var$tag("b");
-var $167d3d2ca4cb5316$export$9852986a3ec5f6a0 = $167d3d2ca4cb5316$var$tag("table");
-var $167d3d2ca4cb5316$export$7cdd536eaa8f163c = $167d3d2ca4cb5316$var$tag("tbody");
-var $167d3d2ca4cb5316$export$407448d2b89b1813 = $167d3d2ca4cb5316$var$tag("a");
-var $167d3d2ca4cb5316$export$afc1bfabebaf28a2 = $167d3d2ca4cb5316$var$tag("span");
-var $167d3d2ca4cb5316$export$f00aeb236b6f05af = function() {
+var $01bb812f4aef4969$export$41ee12f6f6f05843 = $01bb812f4aef4969$var$tag("details");
+var $01bb812f4aef4969$export$9a2dbef7a17e2e58 = $01bb812f4aef4969$var$tag("summary");
+var $01bb812f4aef4969$export$72451b88a72ad9c2 = $01bb812f4aef4969$var$tag("tr");
+var $01bb812f4aef4969$export$2beef8af2014e5c6 = $01bb812f4aef4969$var$tag("td");
+var $01bb812f4aef4969$export$d657bc098992a431 = $01bb812f4aef4969$var$tag("th");
+var $01bb812f4aef4969$export$8b22cf2602fb60ce = $01bb812f4aef4969$var$tag("b");
+var $01bb812f4aef4969$export$9852986a3ec5f6a0 = $01bb812f4aef4969$var$tag("table");
+var $01bb812f4aef4969$export$7cdd536eaa8f163c = $01bb812f4aef4969$var$tag("tbody");
+var $01bb812f4aef4969$export$407448d2b89b1813 = $01bb812f4aef4969$var$tag("a");
+var $01bb812f4aef4969$export$afc1bfabebaf28a2 = $01bb812f4aef4969$var$tag("span");
+var $01bb812f4aef4969$export$f00aeb236b6f05af = function() {
     for(var _len = arguments.length, children = new Array(_len), _key = 0; _key < _len; _key++){
         children[_key] = arguments[_key];
     }
@@ -91,24 +91,24 @@ var $167d3d2ca4cb5316$export$f00aeb236b6f05af = function() {
 
 
 
-var $0203d2d5b98943d8$var$filename = function(file, indent, options) {
+var $87b363d021601373$var$filename = function(file, indent, options) {
     var relative = file.file.replace(options.prefix, "");
     var href = "https://github.com/".concat(options.repository, "/blob/").concat(options.commit, "/").concat(relative);
     var parts = relative.split("/");
     var last = parts[parts.length - 1];
     var space = indent ? "&nbsp; &nbsp;" : "";
-    return (0, $167d3d2ca4cb5316$export$f00aeb236b6f05af)(space, (0, $167d3d2ca4cb5316$export$407448d2b89b1813)({
+    return (0, $01bb812f4aef4969$export$f00aeb236b6f05af)(space, (0, $01bb812f4aef4969$export$407448d2b89b1813)({
         href: href
     }, last));
 };
-var $0203d2d5b98943d8$var$percentage = function(item) {
+var $87b363d021601373$var$percentage = function(item) {
     if (!item) return "N/A";
     var value = item.found === 0 ? 100 : item.hit / item.found * 100;
     var rounded = value.toFixed(2).replace(RegExp("\\.0*$", "u"), "");
-    var tag = value === 100 ? (0, $167d3d2ca4cb5316$export$f00aeb236b6f05af) : (0, $167d3d2ca4cb5316$export$8b22cf2602fb60ce);
+    var tag = value === 100 ? (0, $01bb812f4aef4969$export$f00aeb236b6f05af) : (0, $01bb812f4aef4969$export$8b22cf2602fb60ce);
     return tag("".concat(rounded, "%"));
 };
-var $0203d2d5b98943d8$var$uncovered = function(file, options) {
+var $87b363d021601373$var$uncovered = function(file, options) {
     var branches = (file.branches ? file.branches.details : []).filter(function(branch) {
         return branch.taken === 0;
     }).map(function(branch) {
@@ -119,26 +119,26 @@ var $0203d2d5b98943d8$var$uncovered = function(file, options) {
     }).map(function(line) {
         return line.line;
     });
-    var all = (0, ($parcel$interopDefault($70OUV$swchelperslib_to_consumable_arrayjs)))(branches).concat((0, ($parcel$interopDefault($70OUV$swchelperslib_to_consumable_arrayjs)))(lines)).sort();
+    var all = (0, ($parcel$interopDefault($8v44x$swchelperslib_to_consumable_arrayjs)))(branches).concat((0, ($parcel$interopDefault($8v44x$swchelperslib_to_consumable_arrayjs)))(lines)).sort();
     return all.map(function(line) {
         var relative = file.file.replace(options.prefix, "");
         var href = "https://github.com/".concat(options.repository, "/blob/").concat(options.commit, "/").concat(relative, "#L").concat(line);
-        return (0, $167d3d2ca4cb5316$export$407448d2b89b1813)({
+        return (0, $01bb812f4aef4969$export$407448d2b89b1813)({
             href: href
         }, line);
     }).join(", ");
 };
-var $0203d2d5b98943d8$var$toRow = function(file, indent, options) {
-    return (0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)($0203d2d5b98943d8$var$filename(file, indent, options)), (0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)($0203d2d5b98943d8$var$percentage(file.branches, options)), (0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)($0203d2d5b98943d8$var$percentage(file.functions, options)), (0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)($0203d2d5b98943d8$var$percentage(file.lines, options)), (0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)($0203d2d5b98943d8$var$uncovered(file, options)));
+var $87b363d021601373$var$toRow = function(file, indent, options) {
+    return (0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$2beef8af2014e5c6)($87b363d021601373$var$filename(file, indent, options)), (0, $01bb812f4aef4969$export$2beef8af2014e5c6)($87b363d021601373$var$percentage(file.branches, options)), (0, $01bb812f4aef4969$export$2beef8af2014e5c6)($87b363d021601373$var$percentage(file.functions, options)), (0, $01bb812f4aef4969$export$2beef8af2014e5c6)($87b363d021601373$var$percentage(file.lines, options)), (0, $01bb812f4aef4969$export$2beef8af2014e5c6)($87b363d021601373$var$uncovered(file, options)));
 };
-var $0203d2d5b98943d8$var$toFolder = function(path) {
+var $87b363d021601373$var$toFolder = function(path) {
     if (path === "") return "";
-    return (0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$2beef8af2014e5c6)({
+    return (0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$2beef8af2014e5c6)({
         colspan: 5
-    }, (0, $167d3d2ca4cb5316$export$8b22cf2602fb60ce)(path)));
+    }, (0, $01bb812f4aef4969$export$8b22cf2602fb60ce)(path)));
 };
-var $0203d2d5b98943d8$export$ca9b9ec2a0bc981c = function(lcov, options) {
-    var head = (0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$d657bc098992a431)("File"), (0, $167d3d2ca4cb5316$export$d657bc098992a431)("Branches"), (0, $167d3d2ca4cb5316$export$d657bc098992a431)("Funcs"), (0, $167d3d2ca4cb5316$export$d657bc098992a431)("Lines"), (0, $167d3d2ca4cb5316$export$d657bc098992a431)("Uncovered Lines"));
+var $87b363d021601373$export$ca9b9ec2a0bc981c = function(lcov, options) {
+    var head = (0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$d657bc098992a431)("File"), (0, $01bb812f4aef4969$export$d657bc098992a431)("Branches"), (0, $01bb812f4aef4969$export$d657bc098992a431)("Funcs"), (0, $01bb812f4aef4969$export$d657bc098992a431)("Lines"), (0, $01bb812f4aef4969$export$d657bc098992a431)("Uncovered Lines"));
     var folders = {};
     var _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
     try {
@@ -164,15 +164,15 @@ var $0203d2d5b98943d8$export$ca9b9ec2a0bc981c = function(lcov, options) {
         }
     }
     var rows = Object.keys(folders).sort().reduce(function(acc, key) {
-        return (0, ($parcel$interopDefault($70OUV$swchelperslib_to_consumable_arrayjs)))(acc).concat([
-            $0203d2d5b98943d8$var$toFolder(key, options)
-        ], (0, ($parcel$interopDefault($70OUV$swchelperslib_to_consumable_arrayjs)))(folders[key].map(function(file) {
-            return $0203d2d5b98943d8$var$toRow(file, key !== "", options);
+        return (0, ($parcel$interopDefault($8v44x$swchelperslib_to_consumable_arrayjs)))(acc).concat([
+            $87b363d021601373$var$toFolder(key, options)
+        ], (0, ($parcel$interopDefault($8v44x$swchelperslib_to_consumable_arrayjs)))(folders[key].map(function(file) {
+            return $87b363d021601373$var$toRow(file, key !== "", options);
         })));
     }, []);
-    return (0, $167d3d2ca4cb5316$export$9852986a3ec5f6a0)((0, $167d3d2ca4cb5316$export$7cdd536eaa8f163c).apply(void 0, [
+    return (0, $01bb812f4aef4969$export$9852986a3ec5f6a0)((0, $01bb812f4aef4969$export$7cdd536eaa8f163c).apply(void 0, [
         head
-    ].concat((0, ($parcel$interopDefault($70OUV$swchelperslib_to_consumable_arrayjs)))(rows))));
+    ].concat((0, ($parcel$interopDefault($8v44x$swchelperslib_to_consumable_arrayjs)))(rows))));
 };
 
 
@@ -180,7 +180,7 @@ var $0203d2d5b98943d8$export$ca9b9ec2a0bc981c = function(lcov, options) {
  * Compares two arrays of objects and returns with unique lines update
  * @param {number} pdiff value from diff percentage
  * @returns {string} emoji string for negative/positive pdiff
- */ var $5a804a5eff6031ee$var$renderEmoji = function(pdiff) {
+ */ var $d25e083c9cc99e64$var$renderEmoji = function(pdiff) {
     if (pdiff.toFixed(2) < 0) return "❌";
     return "✅";
 };
@@ -188,7 +188,7 @@ var $0203d2d5b98943d8$export$ca9b9ec2a0bc981c = function(lcov, options) {
  * Compares two arrays of objects and returns with unique lines update
  * @param {Array} otherArray
  * @returns {Function} function with filtering non original lines
- */ var $5a804a5eff6031ee$var$comparer = function(otherArray) {
+ */ var $d25e083c9cc99e64$var$comparer = function(otherArray) {
     return function(current) {
         return otherArray.filter(function(other) {
             return other.lines.found === current.lines.found && other.lines.hit === current.lines.hit;
@@ -200,60 +200,60 @@ var $0203d2d5b98943d8$export$ca9b9ec2a0bc981c = function(lcov, options) {
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
  * @param {{Array<{packageName, lcovBasePath}>}} lcovBaseArrayForMonorepo
  * @param {*} options
- */ var $5a804a5eff6031ee$var$commentForMonorepo = function(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options) {
+ */ var $d25e083c9cc99e64$var$commentForMonorepo = function(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options) {
     var base = options.base;
     var html = lcovArrayForMonorepo.map(function(lcovObj) {
         var baseLcov = lcovBaseArrayForMonorepo.find(function(el) {
             return el.packageName === lcovObj.packageName;
         });
-        var pbefore = baseLcov ? (0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(baseLcov.lcov) : 0;
-        var pafter = baseLcov ? (0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(lcovObj.lcov) : 0;
+        var pbefore = baseLcov ? (0, $688e957b405e23ce$export$a3560dfa62c7efe0)(baseLcov.lcov) : 0;
+        var pafter = baseLcov ? (0, $688e957b405e23ce$export$a3560dfa62c7efe0)(lcovObj.lcov) : 0;
         var pdiff = pafter - pbefore;
         var plus = pdiff > 0 ? "+" : "";
         var arrow = "";
         if (pdiff < 0) arrow = "▾";
         else if (pdiff > 0) arrow = "▴";
-        var pdiffHtml = baseLcov ? (0, $167d3d2ca4cb5316$export$d657bc098992a431)($5a804a5eff6031ee$var$renderEmoji(pdiff), " ", arrow, " ", plus, pdiff.toFixed(2), "%") : "";
+        var pdiffHtml = baseLcov ? (0, $01bb812f4aef4969$export$d657bc098992a431)($d25e083c9cc99e64$var$renderEmoji(pdiff), " ", arrow, " ", plus, pdiff.toFixed(2), "%") : "";
         var report = lcovObj.lcov;
         if (baseLcov) {
-            var onlyInLcov = lcovObj.lcov.filter($5a804a5eff6031ee$var$comparer(baseLcov));
-            var onlyInBefore = baseLcov.filter($5a804a5eff6031ee$var$comparer(lcovObj.lcov));
+            var onlyInLcov = lcovObj.lcov.filter($d25e083c9cc99e64$var$comparer(baseLcov));
+            var onlyInBefore = baseLcov.filter($d25e083c9cc99e64$var$comparer(lcovObj.lcov));
             report = onlyInBefore.concat(onlyInLcov);
         }
-        return "".concat((0, $167d3d2ca4cb5316$export$9852986a3ec5f6a0)((0, $167d3d2ca4cb5316$export$7cdd536eaa8f163c)((0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$d657bc098992a431)(lcovObj.packageName), (0, $167d3d2ca4cb5316$export$d657bc098992a431)((0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(lcovObj.lcov).toFixed(2), "%"), pdiffHtml))), " \n\n ").concat((0, $167d3d2ca4cb5316$export$41ee12f6f6f05843)((0, $167d3d2ca4cb5316$export$9a2dbef7a17e2e58)("Coverage Report"), (0, $0203d2d5b98943d8$export$ca9b9ec2a0bc981c)(report, options)), " <br/>");
+        return "".concat((0, $01bb812f4aef4969$export$9852986a3ec5f6a0)((0, $01bb812f4aef4969$export$7cdd536eaa8f163c)((0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$d657bc098992a431)(lcovObj.packageName), (0, $01bb812f4aef4969$export$d657bc098992a431)((0, $688e957b405e23ce$export$a3560dfa62c7efe0)(lcovObj.lcov).toFixed(2), "%"), pdiffHtml))), " \n\n ").concat((0, $01bb812f4aef4969$export$41ee12f6f6f05843)((0, $01bb812f4aef4969$export$9a2dbef7a17e2e58)("Coverage Report"), (0, $87b363d021601373$export$ca9b9ec2a0bc981c)(report, options)), " <br/>");
     });
-    var title = "Coverage after merging into ".concat((0, $167d3d2ca4cb5316$export$8b22cf2602fb60ce)(base), " <p></p>");
-    return (0, $167d3d2ca4cb5316$export$f00aeb236b6f05af)(title, html.join(""));
+    var title = "Coverage after merging into ".concat((0, $01bb812f4aef4969$export$8b22cf2602fb60ce)(base), " <p></p>");
+    return (0, $01bb812f4aef4969$export$f00aeb236b6f05af)(title, html.join(""));
 };
 /**
  * Github comment for single repo
  * @param {raw lcov} lcov
  * @param {*} options
- */ var $5a804a5eff6031ee$var$comment = function(lcov, before, options) {
+ */ var $d25e083c9cc99e64$var$comment = function(lcov, before, options) {
     var appName = options.appName, base = options.base;
-    var pbefore = before ? (0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(before) : 0;
-    var pafter = before ? (0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(lcov) : 0;
+    var pbefore = before ? (0, $688e957b405e23ce$export$a3560dfa62c7efe0)(before) : 0;
+    var pafter = before ? (0, $688e957b405e23ce$export$a3560dfa62c7efe0)(lcov) : 0;
     var pdiff = pafter - pbefore;
     var plus = pdiff > 0 ? "+" : "";
     var arrow = "";
     if (pdiff < 0) arrow = "▾";
     else if (pdiff > 0) arrow = "▴";
-    var pdiffHtml = before ? (0, $167d3d2ca4cb5316$export$d657bc098992a431)($5a804a5eff6031ee$var$renderEmoji(pdiff), " ", arrow, " ", plus, pdiff.toFixed(2), "%") : "";
+    var pdiffHtml = before ? (0, $01bb812f4aef4969$export$d657bc098992a431)($d25e083c9cc99e64$var$renderEmoji(pdiff), " ", arrow, " ", plus, pdiff.toFixed(2), "%") : "";
     var report = lcov;
     if (before) {
-        var onlyInLcov = lcov.filter($5a804a5eff6031ee$var$comparer(before));
-        var onlyInBefore = before.filter($5a804a5eff6031ee$var$comparer(lcov));
+        var onlyInLcov = lcov.filter($d25e083c9cc99e64$var$comparer(before));
+        var onlyInBefore = before.filter($d25e083c9cc99e64$var$comparer(lcov));
         report = onlyInBefore.concat(onlyInLcov);
     }
-    var title = "Coverage after merging into ".concat((0, $167d3d2ca4cb5316$export$8b22cf2602fb60ce)(base), " <p></p>");
-    var header = appName ? (0, $167d3d2ca4cb5316$export$7cdd536eaa8f163c)((0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$d657bc098992a431)(appName), (0, $167d3d2ca4cb5316$export$d657bc098992a431)((0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(lcov).toFixed(2), "%"), pdiffHtml)) : (0, $167d3d2ca4cb5316$export$7cdd536eaa8f163c)((0, $167d3d2ca4cb5316$export$72451b88a72ad9c2)((0, $167d3d2ca4cb5316$export$d657bc098992a431)((0, $4972ce6f03c7f1c7$export$a3560dfa62c7efe0)(lcov).toFixed(2), "%"), pdiffHtml));
-    return (0, $167d3d2ca4cb5316$export$f00aeb236b6f05af)(title, (0, $167d3d2ca4cb5316$export$9852986a3ec5f6a0)(header), "\n\n", (0, $167d3d2ca4cb5316$export$41ee12f6f6f05843)((0, $167d3d2ca4cb5316$export$9a2dbef7a17e2e58)("Coverage Report"), (0, $0203d2d5b98943d8$export$ca9b9ec2a0bc981c)(report, options)));
+    var title = "Coverage after merging into ".concat((0, $01bb812f4aef4969$export$8b22cf2602fb60ce)(base), " <p></p>");
+    var header = appName ? (0, $01bb812f4aef4969$export$7cdd536eaa8f163c)((0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$d657bc098992a431)(appName), (0, $01bb812f4aef4969$export$d657bc098992a431)((0, $688e957b405e23ce$export$a3560dfa62c7efe0)(lcov).toFixed(2), "%"), pdiffHtml)) : (0, $01bb812f4aef4969$export$7cdd536eaa8f163c)((0, $01bb812f4aef4969$export$72451b88a72ad9c2)((0, $01bb812f4aef4969$export$d657bc098992a431)((0, $688e957b405e23ce$export$a3560dfa62c7efe0)(lcov).toFixed(2), "%"), pdiffHtml));
+    return (0, $01bb812f4aef4969$export$f00aeb236b6f05af)(title, (0, $01bb812f4aef4969$export$9852986a3ec5f6a0)(header), "\n\n", (0, $01bb812f4aef4969$export$41ee12f6f6f05843)((0, $01bb812f4aef4969$export$9a2dbef7a17e2e58)("Coverage Report"), (0, $87b363d021601373$export$ca9b9ec2a0bc981c)(report, options)));
 };
-var $5a804a5eff6031ee$export$a37e3c603d7117e5 = function(lcov, before, options) {
-    return $5a804a5eff6031ee$var$comment(lcov, before, options);
+var $d25e083c9cc99e64$export$a37e3c603d7117e5 = function(lcov, before, options) {
+    return $d25e083c9cc99e64$var$comment(lcov, before, options);
 };
-var $5a804a5eff6031ee$export$bca70a385d0ec2e1 = function(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options) {
-    return $5a804a5eff6031ee$var$commentForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options);
+var $d25e083c9cc99e64$export$bca70a385d0ec2e1 = function(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options) {
+    return $d25e083c9cc99e64$var$commentForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options);
 };
 
 
@@ -272,19 +272,19 @@ var $5a804a5eff6031ee$export$bca70a385d0ec2e1 = function(lcovArrayForMonorepo, l
 
 
 
-var $9a8d93f20edd9179$var$appendHiddenHeaderToComment = function(body, hiddenHeader) {
+var $2455f16761467012$var$appendHiddenHeaderToComment = function(body, hiddenHeader) {
     return hiddenHeader + body;
 };
-var $9a8d93f20edd9179$var$listComments = function() {
-    var _ref = (0, ($parcel$interopDefault($70OUV$swchelperslib_async_to_generatorjs)))(function(param) {
+var $2455f16761467012$var$listComments = function() {
+    var _ref = (0, ($parcel$interopDefault($8v44x$swchelperslib_async_to_generatorjs)))(function(param) {
         var client, context, prNumber, hiddenHeader, _client_issues, _ref, _ref1, existingComments;
-        return (0, ($parcel$interopDefault($70OUV$swchelperslib_ts_generatorjs)))(this, function(_state) {
+        return (0, ($parcel$interopDefault($8v44x$swchelperslib_ts_generatorjs)))(this, function(_state) {
             switch(_state.label){
                 case 0:
                     client = param.client, context = param.context, prNumber = param.prNumber, hiddenHeader = param.hiddenHeader;
                     return [
                         4,
-                        (_client_issues = client.issues) === null || _client_issues === void 0 ? void 0 : _client_issues.listComments((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spreadjs)))({}, context.repo), {
+                        (_client_issues = client.issues) === null || _client_issues === void 0 ? void 0 : _client_issues.listComments((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spreadjs)))({}, context.repo), {
                             issue_number: prNumber
                         }))
                     ];
@@ -304,39 +304,39 @@ var $9a8d93f20edd9179$var$listComments = function() {
         return _ref.apply(this, arguments);
     };
 }();
-var $9a8d93f20edd9179$var$insertComment = function(param, hiddenHeader) {
+var $2455f16761467012$var$insertComment = function(param, hiddenHeader) {
     var client = param.client, context = param.context, prNumber = param.prNumber, body = param.body;
-    return client.issues.createComment((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spreadjs)))({}, context.repo), {
+    return client.issues.createComment((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spreadjs)))({}, context.repo), {
         issue_number: prNumber,
-        body: $9a8d93f20edd9179$var$appendHiddenHeaderToComment(body, hiddenHeader)
+        body: $2455f16761467012$var$appendHiddenHeaderToComment(body, hiddenHeader)
     }));
 };
-var $9a8d93f20edd9179$var$updateComment = function(param, hiddenHeader) {
+var $2455f16761467012$var$updateComment = function(param, hiddenHeader) {
     var client = param.client, context = param.context, body = param.body, commentId = param.commentId;
-    return client.issues.updateComment((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spreadjs)))({}, context.repo), {
+    return client.issues.updateComment((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spreadjs)))({}, context.repo), {
         comment_id: commentId,
-        body: $9a8d93f20edd9179$var$appendHiddenHeaderToComment(body, hiddenHeader)
+        body: $2455f16761467012$var$appendHiddenHeaderToComment(body, hiddenHeader)
     }));
 };
-var $9a8d93f20edd9179$var$deleteComments = function(param) {
+var $2455f16761467012$var$deleteComments = function(param) {
     var client = param.client, context = param.context, comments = param.comments;
     return Promise.all(comments.map(function(param) {
         var id = param.id;
-        return client.issues.deleteComment((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($70OUV$swchelperslib_object_spreadjs)))({}, context.repo), {
+        return client.issues.deleteComment((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spread_propsjs)))((0, ($parcel$interopDefault($8v44x$swchelperslib_object_spreadjs)))({}, context.repo), {
             comment_id: id
         }));
     }));
 };
-var $9a8d93f20edd9179$export$59a2bc1b328cadf5 = function() {
-    var _ref = (0, ($parcel$interopDefault($70OUV$swchelperslib_async_to_generatorjs)))(function(param) {
+var $2455f16761467012$export$59a2bc1b328cadf5 = function() {
+    var _ref = (0, ($parcel$interopDefault($8v44x$swchelperslib_async_to_generatorjs)))(function(param) {
         var client, context, prNumber, body, hiddenHeader, existingComments, last;
-        return (0, ($parcel$interopDefault($70OUV$swchelperslib_ts_generatorjs)))(this, function(_state) {
+        return (0, ($parcel$interopDefault($8v44x$swchelperslib_ts_generatorjs)))(this, function(_state) {
             switch(_state.label){
                 case 0:
                     client = param.client, context = param.context, prNumber = param.prNumber, body = param.body, hiddenHeader = param.hiddenHeader;
                     return [
                         4,
-                        $9a8d93f20edd9179$var$listComments({
+                        $2455f16761467012$var$listComments({
                             client: client,
                             context: context,
                             prNumber: prNumber,
@@ -348,7 +348,7 @@ var $9a8d93f20edd9179$export$59a2bc1b328cadf5 = function() {
                     last = existingComments.pop();
                     return [
                         4,
-                        $9a8d93f20edd9179$var$deleteComments({
+                        $2455f16761467012$var$deleteComments({
                             client: client,
                             context: context,
                             comments: existingComments
@@ -358,12 +358,12 @@ var $9a8d93f20edd9179$export$59a2bc1b328cadf5 = function() {
                     _state.sent();
                     return [
                         2,
-                        last ? $9a8d93f20edd9179$var$updateComment({
+                        last ? $2455f16761467012$var$updateComment({
                             client: client,
                             context: context,
                             body: body,
                             commentId: last.id
-                        }, hiddenHeader) : $9a8d93f20edd9179$var$insertComment({
+                        }, hiddenHeader) : $2455f16761467012$var$insertComment({
                             client: client,
                             context: context,
                             prNumber: prNumber,
@@ -384,14 +384,14 @@ var $9a8d93f20edd9179$export$59a2bc1b328cadf5 = function() {
  * @function getLcovFiles
  * @param  {string} dir Dir path string.
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
- */ var $1672ee25661f8d95$var$getLcovFiles = function(dir, filelist) {
+ */ var $9da33711ab06bf95$var$getLcovFiles = function(dir, filelist) {
     var fileArray = filelist || [];
-    (0, ($parcel$interopDefault($70OUV$fs))).readdirSync(dir).forEach(function(file) {
-        fileArray = (0, ($parcel$interopDefault($70OUV$fs))).statSync((0, ($parcel$interopDefault($70OUV$path))).join(dir, file)).isDirectory() ? $1672ee25661f8d95$var$getLcovFiles((0, ($parcel$interopDefault($70OUV$path))).join(dir, file), fileArray) : fileArray.filter(function(f) {
+    (0, ($parcel$interopDefault($8v44x$fs))).readdirSync(dir).forEach(function(file) {
+        fileArray = (0, ($parcel$interopDefault($8v44x$fs))).statSync((0, ($parcel$interopDefault($8v44x$path))).join(dir, file)).isDirectory() ? $9da33711ab06bf95$var$getLcovFiles((0, ($parcel$interopDefault($8v44x$path))).join(dir, file), fileArray) : fileArray.filter(function(f) {
             return f.path.includes("lcov.info");
         }).concat({
             name: dir.split("/")[1],
-            path: (0, ($parcel$interopDefault($70OUV$path))).join(dir, file)
+            path: (0, ($parcel$interopDefault($8v44x$path))).join(dir, file)
         });
     });
     return fileArray;
@@ -401,30 +401,30 @@ var $9a8d93f20edd9179$export$59a2bc1b328cadf5 = function() {
  * @function getLcovBaseFiles
  * @param  {string} dir Dir path string.
  * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
- */ var $1672ee25661f8d95$var$getLcovBaseFiles = function(dir, filelist) {
+ */ var $9da33711ab06bf95$var$getLcovBaseFiles = function(dir, filelist) {
     var fileArray = filelist || [];
-    (0, ($parcel$interopDefault($70OUV$fs))).readdirSync(dir).forEach(function(file) {
-        fileArray = (0, ($parcel$interopDefault($70OUV$fs))).statSync((0, ($parcel$interopDefault($70OUV$path))).join(dir, file)).isDirectory() ? $1672ee25661f8d95$var$getLcovBaseFiles((0, ($parcel$interopDefault($70OUV$path))).join(dir, file), fileArray) : fileArray.filter(function(f) {
+    (0, ($parcel$interopDefault($8v44x$fs))).readdirSync(dir).forEach(function(file) {
+        fileArray = (0, ($parcel$interopDefault($8v44x$fs))).statSync((0, ($parcel$interopDefault($8v44x$path))).join(dir, file)).isDirectory() ? $9da33711ab06bf95$var$getLcovBaseFiles((0, ($parcel$interopDefault($8v44x$path))).join(dir, file), fileArray) : fileArray.filter(function(f) {
             return f.path.includes("lcov-base.info");
         }).concat({
             name: dir.split("/")[1],
-            path: (0, ($parcel$interopDefault($70OUV$path))).join(dir, file)
+            path: (0, ($parcel$interopDefault($8v44x$path))).join(dir, file)
         });
     });
     return fileArray;
 };
-var $1672ee25661f8d95$var$main = function() {
-    var _ref = (0, ($parcel$interopDefault($70OUV$swchelperslib_async_to_generatorjs)))(function() {
+var $9da33711ab06bf95$var$main = function() {
+    var _ref = (0, ($parcel$interopDefault($8v44x$swchelperslib_async_to_generatorjs)))(function() {
         var _ref, _ref_context, context, token, lcovFile, baseFile, appName, monorepoBasePath, raw, _tmp, baseRaw, _tmp1, lcovArray, lcovBaseArray, lcovArrayForMonorepo, lcovBaseArrayForMonorepo, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, file, rLcove, data, err, _iteratorNormalCompletion1, _didIteratorError1, _iteratorError1, _iterator1, _step1, file1, rLcovBase, data1, err, options, lcov, _tmp2, baselcov, _tmp3, client;
-        return (0, ($parcel$interopDefault($70OUV$swchelperslib_ts_generatorjs)))(this, function(_state) {
+        return (0, ($parcel$interopDefault($8v44x$swchelperslib_ts_generatorjs)))(this, function(_state) {
             switch(_state.label){
                 case 0:
-                    _ref = (0, ($parcel$interopDefault($70OUV$actionsgithub))) || {}, _ref_context = _ref.context, context = _ref_context === void 0 ? {} : _ref_context;
-                    token = (0, ($parcel$interopDefault($70OUV$actionscore))).getInput("github-token");
-                    lcovFile = (0, ($parcel$interopDefault($70OUV$actionscore))).getInput("lcov-file") || "./coverage/lcov.info";
-                    baseFile = (0, ($parcel$interopDefault($70OUV$actionscore))).getInput("lcov-base");
-                    appName = (0, ($parcel$interopDefault($70OUV$actionscore))).getInput("app-name");
-                    monorepoBasePath = (0, ($parcel$interopDefault($70OUV$actionscore))).getInput("monorepo-base-path");
+                    _ref = (0, ($parcel$interopDefault($8v44x$actionsgithub))) || {}, _ref_context = _ref.context, context = _ref_context === void 0 ? {} : _ref_context;
+                    token = (0, ($parcel$interopDefault($8v44x$actionscore))).getInput("github-token");
+                    lcovFile = (0, ($parcel$interopDefault($8v44x$actionscore))).getInput("lcov-file") || "./coverage/lcov.info";
+                    baseFile = (0, ($parcel$interopDefault($8v44x$actionscore))).getInput("lcov-base");
+                    appName = (0, ($parcel$interopDefault($8v44x$actionscore))).getInput("app-name");
+                    monorepoBasePath = (0, ($parcel$interopDefault($8v44x$actionscore))).getInput("monorepo-base-path");
                     _tmp = !monorepoBasePath;
                     if (!_tmp) return [
                         3,
@@ -432,7 +432,7 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $70OUV$fs.promises).readFile(lcovFile, "utf-8").catch(function(err) {
+                        (0, $8v44x$fs.promises).readFile(lcovFile, "utf-8").catch(function(err) {
                             return console.error(err);
                         })
                     ];
@@ -454,7 +454,7 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $70OUV$fs.promises).readFile(baseFile, "utf-8").catch(function(err) {
+                        (0, $8v44x$fs.promises).readFile(baseFile, "utf-8").catch(function(err) {
                             return console.error(err);
                         })
                     ];
@@ -464,8 +464,8 @@ var $1672ee25661f8d95$var$main = function() {
                 case 4:
                     baseRaw = _tmp1;
                     if (!monorepoBasePath && baseFile && !baseRaw) console.log("No coverage report found at '".concat(baseFile, "', ignoring..."));
-                    lcovArray = monorepoBasePath ? $1672ee25661f8d95$var$getLcovFiles(monorepoBasePath) : [];
-                    lcovBaseArray = monorepoBasePath ? $1672ee25661f8d95$var$getLcovBaseFiles(monorepoBasePath) : [];
+                    lcovArray = monorepoBasePath ? $9da33711ab06bf95$var$getLcovFiles(monorepoBasePath) : [];
+                    lcovBaseArray = monorepoBasePath ? $9da33711ab06bf95$var$getLcovBaseFiles(monorepoBasePath) : [];
                     lcovArrayForMonorepo = [];
                     lcovBaseArrayForMonorepo = [];
                     _iteratorNormalCompletion = true, _didIteratorError = false, _iteratorError = undefined;
@@ -491,13 +491,13 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $70OUV$fs.promises).readFile(file.path, "utf8")
+                        (0, $8v44x$fs.promises).readFile(file.path, "utf8")
                     ];
                 case 7:
                     rLcove = _state.sent();
                     return [
                         4,
-                        (0, $4972ce6f03c7f1c7$export$98e6a39c04603d36)(rLcove)
+                        (0, $688e957b405e23ce$export$98e6a39c04603d36)(rLcove)
                     ];
                 case 8:
                     data = _state.sent();
@@ -562,13 +562,13 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $70OUV$fs.promises).readFile(file1.path, "utf8")
+                        (0, $8v44x$fs.promises).readFile(file1.path, "utf8")
                     ];
                 case 16:
                     rLcovBase = _state.sent();
                     return [
                         4,
-                        (0, $4972ce6f03c7f1c7$export$98e6a39c04603d36)(rLcovBase)
+                        (0, $688e957b405e23ce$export$98e6a39c04603d36)(rLcovBase)
                     ];
                 case 17:
                     data1 = _state.sent();
@@ -625,7 +625,7 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $4972ce6f03c7f1c7$export$98e6a39c04603d36)(raw)
+                        (0, $688e957b405e23ce$export$98e6a39c04603d36)(raw)
                     ];
                 case 23:
                     _tmp2 = _state.sent();
@@ -639,21 +639,21 @@ var $1672ee25661f8d95$var$main = function() {
                     ];
                     return [
                         4,
-                        (0, $4972ce6f03c7f1c7$export$98e6a39c04603d36)(baseRaw)
+                        (0, $688e957b405e23ce$export$98e6a39c04603d36)(baseRaw)
                     ];
                 case 25:
                     _tmp3 = _state.sent();
                     _state.label = 26;
                 case 26:
                     baselcov = _tmp3;
-                    client = (0, ($parcel$interopDefault($70OUV$actionsgithub))).getOctokit(token);
+                    client = (0, ($parcel$interopDefault($8v44x$actionsgithub))).getOctokit(token);
                     return [
                         4,
-                        (0, $9a8d93f20edd9179$export$59a2bc1b328cadf5)({
+                        (0, $2455f16761467012$export$59a2bc1b328cadf5)({
                             client: client,
                             context: context,
                             prNumber: context.payload.pull_request.number,
-                            body: !lcovArrayForMonorepo.length ? (0, $5a804a5eff6031ee$export$a37e3c603d7117e5)(lcov, baselcov, options) : (0, $5a804a5eff6031ee$export$bca70a385d0ec2e1)(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options),
+                            body: !lcovArrayForMonorepo.length ? (0, $d25e083c9cc99e64$export$a37e3c603d7117e5)(lcov, baselcov, options) : (0, $d25e083c9cc99e64$export$bca70a385d0ec2e1)(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options),
                             hiddenHeader: appName ? "<!-- ".concat(appName, "-code-coverage-assistant -->") : "<!-- monorepo-code-coverage-assistant -->"
                         })
                     ];
@@ -669,10 +669,9 @@ var $1672ee25661f8d95$var$main = function() {
         return _ref.apply(this, arguments);
     };
 }();
-$1672ee25661f8d95$var$main().catch(function(err) {
+$9da33711ab06bf95$var$main().catch(function(err) {
     console.log(err);
-    (0, ($parcel$interopDefault($70OUV$actionscore))).setFailed(err.message);
+    (0, ($parcel$interopDefault($8v44x$actionscore))).setFailed(err.message);
 });
 
 
-//# sourceMappingURL=main.js.map
