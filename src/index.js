@@ -1,4 +1,4 @@
-import fs, { promises } from "fs";
+import fs, { promises } from "node:fs";
 import path from "path";
 import core from "@actions/core";
 import github from "@actions/github";

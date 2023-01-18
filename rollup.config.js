@@ -3,6 +3,7 @@ import { terser } from "rollup-plugin-terser";
 import resolve from "@rollup/plugin-node-resolve";
 import json from "@rollup/plugin-json";
 import externals from "rollup-plugin-node-externals";
+import builtins from "rollup-plugin-node-builtins";
 
 export default {
     input: "src/index.js",
@@ -13,6 +14,7 @@ export default {
     treeshake: true,
     plugins: [
         terser(),
+        builtins(),
         externals({
             builtin: true,
             deps: false,
