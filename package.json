@@ -13,7 +13,7 @@
     ],
     "main": "index.js",
     "scripts": {
-        "build": "rollup -c --bundleConfigAsCjs",
+        "build": "rollup -c",
         "test": "jest --passWithNoTests --coverage",
         "local": "babel-node src/cli",
         "format": "prettier --write src/*.js src/**/*.js *.js",
