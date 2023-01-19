@@ -40,7 +40,7 @@ const getLcovBaseFiles = (dir, filelist) => {
         fileArray = fs.statSync(path.join(dir, file)).isDirectory()
             ? getLcovBaseFiles(path.join(dir, file), fileArray)
             : fileArray
-                  .filter((f) => f.path.includes("lcov-base.info"))
+                  .filter((f) => f.path.includes("lcov-base"))
                   .concat({
                       name: dir.split("/")[1],
                       path: path.join(dir, file),
