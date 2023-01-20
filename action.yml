@@ -1,4 +1,4 @@
-name: Code Coverage Report
+name: Code Coverage Assistant
 description: Comments a pull request with the code coverage for mono repo and single repo
 author: "Eesh Tyagi, Marina, John Hannagan"
 branding:
