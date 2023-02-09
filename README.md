@@ -16,7 +16,7 @@ Just add this action to one of your [workflow files](https://docs.github.com/en/
 
 ```yml
 - name: Add coverage comment
-  uses: ScaCap/code-coverage-assistant@v1
+  uses: ScaCap/code-coverage-assistant@<master | latest tag>
 ```
 
 ### Action inputs
