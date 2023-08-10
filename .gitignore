@@ -2,3 +2,5 @@ node_modules/
 coverage/
 .eslintcache
 .DS_Store
+.idea
+badges/

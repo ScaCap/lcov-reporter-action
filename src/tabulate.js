@@ -1,4 +1,4 @@
-import { th, tr, td, table, tbody, a, b, fragment } from "./html";
+import { a, b, fragment, table, tbody, td, th, tr } from "./html";
 
 const filename = (file, indent, options) => {
     const relative = file.file.replace(options.prefix, "");

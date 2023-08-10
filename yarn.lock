@@ -2006,6 +2006,11 @@ babel-preset-jest@^29.2.0:
     babel-plugin-jest-hoist "^29.2.0"
     babel-preset-current-node-syntax "^1.0.0"
 
+badgen@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/badgen/-/badgen-3.2.3.tgz#d050e3fa99e5929e9b93cab98d8fb612b5a8b2ef"
+  integrity sha512-svDuwkc63E/z0ky3drpUppB83s/nlgDciH9m+STwwQoWyq7yCgew1qEfJ+9axkKdNq7MskByptWUN9j1PGMwFA==
+
 balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"

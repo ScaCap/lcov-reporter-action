@@ -17,7 +17,6 @@ module.exports = {
         "generator-star-spacing": ["error", { before: false, after: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "max-depth": ["error", 10],
-        "newline-before-return": "error",
         "no-alert": "error",
         "no-confusing-arrow": ["error", { allowParens: false }],
         "no-constant-condition": "error",

@@ -117,3 +117,7 @@ test("percentage should calculate the correct percentage", () => {
         ]),
     ).toBe(75);
 });
+
+test("percentage of an empty set must be zero", () => {
+    expect(percentage([])).toBe(0);
+});

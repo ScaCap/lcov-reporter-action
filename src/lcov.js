@@ -22,5 +22,5 @@ export const percentage = (lcovData) => {
         found += entry.lines.found;
     }
 
-    return (hit / found) * 100;
+    return found === 0 ? 0 : (hit / found) * 100;
 };

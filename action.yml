@@ -20,6 +20,32 @@ inputs:
     app-name:
         description: App name to display on comment
         required: false
+    max_lines:
+      description: Maximum numbers of line print
+      required: false
+      default: "15"
+    min_coverage:
+        description: Minimum coverage percentage allowed
+        required: false
+        default: "100"
+    exclude:
+      description: list of files you would like to exclude from min_coverage check
+      required: false
+    exclude_root:
+      description: exclude the root project coverage from min_coverage check
+      required: false
+    badge_path:
+      description: Output badge path.
+      default: build
+      required: false
+    badge_style:
+      description: 'Badges style: flat, classic.'
+      default: classic
+      required: false
+    badge_label:
+      description: The left label of the badge, usually static.
+      default: coverage
+      required: false
 runs:
     using: node16
     main: dist/main.js
