@@ -1,4 +1,4 @@
-import { details, summary, b, fragment, table, tbody, tr, th, p } from "./html";
+import { b, details, fragment, p, summary, table, tbody, th, tr } from "./html";
 import { percentage } from "./lcov";
 import { tabulate } from "./tabulate";
 
@@ -35,7 +35,6 @@ const comparer = (otherArray) => (current) =>
     ).length === 0;
 
 const renderLcov = (lcov, base, appTitle, options) => {
-    const maxLines = options.maxLines || 15;
     const pbefore = base ? percentage(base) : 0;
     const pafter = base ? percentage(lcov) : 0;
     const pdiff = pafter - pbefore;
@@ -71,7 +70,7 @@ const renderLcov = (lcov, base, appTitle, options) => {
     }
     return [
         table(tbody(tr(...row))),
-        report.length > maxLines
+        report.length > options.maxLines
             ? p("Coverage Report too long to display")
             : details(summary("Coverage Report"), tabulate(report, options)),
         "<br/>",
@@ -81,10 +80,10 @@ const renderLcov = (lcov, base, appTitle, options) => {
 /**
  * Github comment for monorepo
  * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
- * @param {{Array<{packageName, lcovBasePath}>}} lcovBaseArrayForMonorepo
+ * @param {Array<{packageName, lcovPath}>} lcovBaseArrayForMonorepo
  * @param {*} options
  */
-const commentForMonorepo = (
+const renderCommentArray = (
     lcovArrayForMonorepo,
     lcovBaseArrayForMonorepo,
     options,
@@ -110,32 +109,68 @@ const commentForMonorepo = (
 
 /**
  * Github comment for single repo
- * @param {raw lcov} lcov
+ * @param {raw} lcov
+ * @param {raw} baseLcov
+ * @param {string} appTitle
  * @param {*} options
  */
-const comment = (lcov, before, options) => {
-    const { appName, base } = options;
+const renderCommentLine = (lcov, baseLcov, appTitle, options) => {
+    const inner = renderLcov(lcov, baseLcov, appTitle, options);
+    const { base } = options;
     const title = `Coverage after merging into ${b(base)} <p></p>`;
-    return fragment(title, renderLcov(lcov, before, appName, options));
+    return fragment(title, inner);
 };
 
-/**
- * Diff in coverage percentage for single repo
- * @param {raw lcov} lcov
- * @param {raw base lcov} before
- * @param {*} options
- */
-export const diff = (lcov, before, options) => comment(lcov, before, options);
-
-/**
- * Diff in coverage percentage for monorepo
- * @param {Array<{packageName, lcovPath}>} lcovArrayForMonorepo
- * @param {{Array<{packageName, lcovBasePath}>}} lcovBaseArrayForMonorepo
- * @param {*} options
- */
-export const diffForMonorepo = (
-    lcovArrayForMonorepo,
-    lcovBaseArrayForMonorepo,
+export const comments = async ({
+    rootLcov,
+    rootBaseLcov,
+    lcovArray,
+    lcovBaseArray,
     options,
-) =>
-    commentForMonorepo(lcovArrayForMonorepo, lcovBaseArrayForMonorepo, options);
+    upsert,
+}) => {
+    if (!options.pullRequest) {
+        return;
+    }
+    const renderOptions = {
+        maxLines: options.maxLines,
+        prefix: options.prefix,
+        repository: options.repository,
+        commit: options.pullRequest.head.sha,
+        head: options.pullRequest.head.ref,
+        base: options.pullRequest.base.ref,
+    };
+    // Comments
+    if (lcovArray.length > 0) {
+        if (options.multipleComment) {
+            for (const lcovObj of lcovArray) {
+                const baseLcov = lcovBaseArray.find(
+                    (el) => el.packageName === lcovObj.packageName,
+                );
+                const body = renderCommentLine(
+                    lcovObj.lcov,
+                    baseLcov && baseLcov.lcov,
+                    lcovObj.packageName,
+                    renderOptions,
+                );
+                await upsert(`m-${lcovObj.packageName}`, body);
+            }
+        } else {
+            const body = renderCommentArray(
+                lcovArray,
+                lcovBaseArray,
+                renderOptions,
+            );
+            await upsert("single-comment", body);
+        }
+    }
+    if (rootLcov) {
+        const body = renderCommentLine(
+            rootLcov,
+            rootBaseLcov,
+            "root",
+            renderOptions,
+        );
+        await upsert(`root-comment`, body);
+    }
+};

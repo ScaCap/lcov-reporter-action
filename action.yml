@@ -20,6 +20,9 @@ inputs:
     app-name:
         description: App name to display on comment
         required: false
+    multiple-comment:
+      description: Add multiple comments
+      required: false
     max_lines:
       description: Maximum numbers of line print
       required: false

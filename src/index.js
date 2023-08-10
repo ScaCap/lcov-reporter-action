@@ -1,138 +1,68 @@
+import fs from "fs";
 import core from "@actions/core";
 import github from "@actions/github";
-import { diff, diffForMonorepo } from "./comment";
+import { codeCoverageAssistant } from "./codeCoverageAssistant";
 import { upsertComment } from "./github";
-import { getLcovArray, readLcov } from "./monorepo";
-import { checkCoverage } from "./check";
-import { createBadges } from "./badge";
+import { getLcovArray } from "./monorepo";
 
-const main = async () => {
-    const addPackageName = (x) => ({
-        ...x,
-        ...{ packageName: x.dir.split("/")[1] },
-    });
-    const { context = {} } = github || {};
-    const token = core.getInput("github-token");
-    const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
-    const baseFile = core.getInput("lcov-base");
-    const appName = core.getInput("app-name");
-    const maxLines = core.getInput("max_lines");
-
-    // Add base path for monorepo
-    const monorepoBasePath =
-        core.getInput("monorepo-base-path") || "./packages";
-
-    const options = {
+const { context = {} } = github || {};
+const token = core.getInput("github-token");
+const githubClient = github.getOctokit(token);
+const appName = core.getInput("app-name") || "noname";
+const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
+const client = {
+    readLCovs: (fileFilter) => {
+        const arr = getLcovArray(monorepoBasePath, fileFilter);
+        return arr.map((x) => ({ ...x, packageName: x.dir.split("/")[1] }));
+    },
+    // Lcov root file
+    lcovFile: core.getInput("lcov-file") || "./coverage/lcov.info",
+    // Lcov base file to compare against
+    baseFile: core.getInput("lcov-base"),
+    upsert: async (title, body) => {
+        const prNumber = context.payload.pull_request.number;
+        const hiddenHeader = `<!-- ${appName}-${title}-code-coverage-assistant -->`;
+        await upsertComment({
+            githubClient,
+            context,
+            prNumber,
+            body,
+            hiddenHeader,
+        });
+    },
+    mkDir: (dirName) => {
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName);
+        } else if (!fs.statSync(dirName).isDirectory()) {
+            throw new Error("badge path is not a directory");
+        }
+    },
+    writeBadge: (fileName, svgStr) => fs.writeFileSync(fileName, svgStr),
+    setFailed: core.setFailed,
+    info: core.info,
+    options: {
+        // Used to generate the comment that is added
         repository: context.payload.repository.full_name,
-        commit: context.payload.pull_request.head.sha,
         prefix: `${process.env.GITHUB_WORKSPACE}/`,
-        head: context.payload.pull_request.head.ref,
-        base: context.payload.pull_request.base.ref,
-        maxLines,
-        appName,
-    };
-    const client = github.getOctokit(token);
-
-    const lcovArrayForMonorepo = (
-        monorepoBasePath
-            ? await getLcovArray(monorepoBasePath, "lcov.info")
-            : []
-    ).map(addPackageName);
-    // Always process root file if exists.
-    const rootLcov = await readLcov(lcovFile);
-
-    // Comments
-    if (maxLines > 0) {
-        if (lcovArrayForMonorepo.length > 0) {
-            await upsertComment({
-                client,
-                context,
-                prNumber: context.payload.pull_request.number,
-                body: diffForMonorepo(
-                    lcovArrayForMonorepo,
-                    (
-                        await getLcovArray(monorepoBasePath, "lcov-base")
-                    ).map(addPackageName),
-                    options,
-                ),
-                hiddenHeader: appName
-                    ? `<!-- ${appName}-code-coverage-assistant -->`
-                    : `<!-- monorepo-code-coverage-assistant -->`,
-            });
-        }
-        if (rootLcov) {
-            await upsertComment({
-                client,
-                context,
-                prNumber: context.payload.pull_request.number,
-                body: diff(
-                    rootLcov,
-                    baseFile && (await readLcov(baseFile)),
-                    options,
-                ),
-                hiddenHeader: appName
-                    ? `<!-- ${appName}-root-code-coverage-assistant -->`
-                    : `<!-- monorepo-root-code-coverage-assistant -->`,
-            });
-        }
-    }
-    // Badge
-    const badgePath = core.getInput("badge_path");
-    if (badgePath) {
-        const badgeOptions = {
-            label: core.getInput("badge_label") || "coverage",
-            style: core.getInput("badge_style") || "classic",
-        };
-        const toBadge = lcovArrayForMonorepo;
-        if (rootLcov) {
-            toBadge.push({
-                packageName: "root_package",
-                lcov: rootLcov,
-            });
-        }
-        createBadges(badgePath, toBadge, badgeOptions);
-    }
-    // Check coverage
-    const minCoverage = core.getInput("min_coverage");
-    if (minCoverage) {
-        const excluded = core.getInput("exclude") || "";
-        const excludedFiles = excluded
-            .split(" ")
-            .map((x) => x.trim())
-            .filter((x) => x.length > 0);
-        console.log("excludedFiles", excludedFiles);
-        const toCheck = lcovArrayForMonorepo.filter(
-            (x) => !excludedFiles.some((y) => x.packageName === y),
-        );
-        const excludeRoot = core.getInput("exclude_root");
-        console.log("excludeRoot", excludedFiles);
-        if (rootLcov && !excludeRoot) {
-            toCheck.unshift({
-                packageName: "root_package",
-                lcov: rootLcov,
-            });
-        }
-        const { isValidBuild, coverage, name } = checkCoverage(
-            minCoverage,
-            toCheck,
-        );
-        if (!isValidBuild) {
-            core.setFailed(
-                `${coverage.toFixed(
-                    2,
-                )}% for ${name} is less than min_coverage ${minCoverage}.`,
-            );
-        } else {
-            core.info(
-                `Coverage: ${coverage.toFixed(
-                    2,
-                )}% is greater than or equal to min_coverage ${minCoverage}.`,
-            );
-        }
-    }
+        pullRequest: context.payload.pull_request,
+        // Render multiple comment lines
+        multipleComment: core.getInput("multiple-comment"),
+        // Maximum number of lines in a comment, used to limit the comment size
+        maxLines: core.getInput("max_lines") || 100,
+        // Minimum coverage, 0 == disable coverage check
+        minCoverage: core.getInput("min_coverage"),
+        // directories to be excluded from coverage check
+        excluded: core.getInput("exclude"),
+        // if true exclude the lcovFile from coverage
+        excludeRoot: core.getInput("exclude_root"),
+        // path to the directory where the badges will be written
+        badgePath: core.getInput("badge_path"),
+        // see https://www.npmjs.com/package/badgen options
+        badgeLabel: core.getInput("badge_label") || "coverage",
+        badgeStyle: core.getInput("badge_style") || "classic",
+    },
 };
-
-main().catch((err) => {
+codeCoverageAssistant(client).catch((err) => {
     console.log(err);
     core.setFailed(err.message);
 });
