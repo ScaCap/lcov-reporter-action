@@ -1,10 +1,9 @@
-import path from "path";
-import fs from "fs";
 import { badgen } from "badgen";
+import path from "path";
 import { percentage } from "./lcov";
 
-const badge = (option, pct) => {
-    const { label = "coverage", style = "classic" } = option || {};
+export const badge = (option, pct) => {
+    const { label = "coverage", style = "classic" } = option;
     const colorData = {
         "49c31a": [100],
         "97c40f": [99.99, 90],
@@ -22,26 +21,37 @@ const badge = (option, pct) => {
     const badgenArgs = {
         style,
         label,
-        status: `${pct < 0 ? "Unknown" : `${pct}%`}`,
-        color: color || "e5e5e5",
+        status: `${pct}%`,
+        color: color,
     };
     return badgen(badgenArgs);
 };
 
-export const createBadges = (badgePath, toCheck, options) => {
-    const dirName = path.resolve(badgePath);
-    if (!fs.existsSync(dirName)) {
-        fs.mkdirSync(dirName);
-    } else if (!fs.statSync(dirName).isDirectory()) {
-        throw new Error("badge path is not a directory");
+export const badges = ({ rootLcov, lcovArray, options, mkDir, writeBadge }) => {
+    const badgeOptions = {
+        label: options.badgeLabel,
+        style: options.badgeStyle,
+    };
+    const toBadge = [];
+    if (lcovArray) lcovArray.forEach((x) => toBadge.push(x));
+    if (rootLcov) {
+        toBadge.push({
+            packageName: "root_package",
+            lcov: rootLcov,
+        });
     }
-    for (const lcovObj of toCheck) {
+    if (toBadge.length === 0) {
+        return;
+    }
+    const dirName = path.resolve(options.badgePath);
+    mkDir(dirName);
+    for (const lcovObj of toBadge) {
         const coverage = percentage(lcovObj.lcov);
-        const svgStr = badge(options, coverage.toFixed(2));
+        const svgStr = badge(badgeOptions, coverage.toFixed(2));
         const fileName = path.join(dirName, `${lcovObj.packageName}.svg`);
         console.log("writing badge", fileName);
         try {
-            fs.writeFileSync(fileName, svgStr);
+            writeBadge(fileName, svgStr);
         } catch (err) {
             console.error("Error writing badge", fileName, err.toString());
         }

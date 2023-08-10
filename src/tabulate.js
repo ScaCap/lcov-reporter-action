@@ -47,9 +47,9 @@ const uncovered = (file, options) => {
 const toRow = (file, indent, options) =>
     tr(
         td(filename(file, indent, options)),
-        td(percentage(file.branches, options)),
-        td(percentage(file.functions, options)),
-        td(percentage(file.lines, options)),
+        td(percentage(file.branches)),
+        td(percentage(file.functions)),
+        td(percentage(file.lines)),
         td(uncovered(file, options)),
     );
 
@@ -84,7 +84,7 @@ export const tabulate = (lcov, options) => {
         .reduce(
             (acc, key) => [
                 ...acc,
-                toFolder(key, options),
+                toFolder(key),
                 ...folders[key].map((file) => toRow(file, key !== "", options)),
             ],
             [],

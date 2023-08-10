@@ -1,63 +1,53 @@
 import process from "process";
 import fs from "fs";
 import path from "path";
-import { diff, diffForMonorepo } from "./comment";
-import { getLcovArray, readLcov } from "./monorepo";
-import { checkCoverage } from "./check";
-import { createBadges } from "./badge";
+import { codeCoverageAssistant } from "./codeCoverageAssistant";
+import { getLcovArray } from "./monorepo";
 
-const addPackageName = (x) => ({
-    ...x,
-    ...{ packageName: x.dir.split("/").slice(-2)[0] },
-});
 const main = async () => {
     const file = process.argv[2];
-    const beforeFile = process.argv[3];
-
     const prefix = `${path.dirname(path.dirname(path.resolve(file)))}/`;
-    const options = {
-        repository: "example/foo",
-        commit: "f9d42291812ed03bb197e48050ac38ac6befe4e5",
-        prefix,
-        head: "feat/test",
-        base: "master",
-        maxLines: "10",
-    };
-
-    if (fs.statSync(file).isDirectory()) {
-        const lcovArrayForMonorepo = (
-            await getLcovArray(file, "lcov.info")
-        ).map(addPackageName);
-        console.log(
-            diffForMonorepo(
-                lcovArrayForMonorepo,
-                await getLcovArray(file, "lcov-base"),
-                options,
-            ),
-        );
-        createBadges("./badges", lcovArrayForMonorepo, {});
-        console.log(checkCoverage(90, lcovArrayForMonorepo));
-    } else {
-        const lcov = await readLcov(file);
-        console.log(
-            diff(lcov, beforeFile && (await readLcov(beforeFile)), options),
-        );
-        createBadges(
-            "./build",
-            {
-                packageName: "root",
-                lcov,
+    const baseClient = {
+        upsert: (title, body) => {
+            console.log("--> COMMENT", "title:", title, "body:", body);
+        },
+        mkDir: (dirName) => console.log("Creating directory", dirName),
+        writeBadge: (fileName) => console.log("written", fileName),
+        setFailed: (...x) => console.error("ERROR", ...x),
+        info: (...x) => console.log("INFO:", ...x),
+        options: {
+            repository: "example/foo",
+            prefix,
+            pullRequest: {
+                commit: "f9d42291812ed03bb197e48050ac38ac6befe4e5",
+                head: "feat/test",
+                base: "master",
             },
-            {},
-        );
-        console.log(
-            checkCoverage(90, [
-                {
-                    packageName: "root",
-                    lcov,
-                },
-            ]),
-        );
+            maxLines: 100,
+            badgePath: "./badges",
+            appName: "someAppName",
+            minCoverage: 80,
+            multipleComment: true,
+        },
+    };
+    if (fs.statSync(file).isDirectory()) {
+        await codeCoverageAssistant({
+            ...baseClient,
+            readLCovs: async (fileFilter) => {
+                const arr = await getLcovArray(file, fileFilter);
+                return arr.map((x) => ({
+                    ...x,
+                    packageName: x.dir.split("/").slice(-2)[0],
+                }));
+            },
+        });
+    } else {
+        await codeCoverageAssistant({
+            ...baseClient,
+            readLCovs: () => [],
+            lcovFile: file,
+            baseFile: "lcov-base",
+        });
     }
 };
 
