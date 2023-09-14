@@ -1,146 +1,68 @@
-import fs, { promises } from "fs";
-import path from "path";
+import fs from "fs";
 import core from "@actions/core";
 import github from "@actions/github";
-import { parse } from "./lcov";
-import { diff, diffForMonorepo } from "./comment";
+import { codeCoverageAssistant } from "./codeCoverageAssistant";
 import { upsertComment } from "./github";
+import { getLcovArray } from "./monorepo";
 
-/**
- * Find all files inside a dir, recursively.
- * @function getLcovFiles
- * @param  {string} dir Dir path string.
- * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
- */
-const getLcovFiles = (dir, filelist) => {
-    let fileArray = filelist || [];
-    fs.readdirSync(dir).forEach((file) => {
-        fileArray = fs.statSync(path.join(dir, file)).isDirectory()
-            ? getLcovFiles(path.join(dir, file), fileArray)
-            : fileArray
-                  .filter((f) => f.path.includes("lcov.info"))
-                  .concat({
-                      name: dir.split("/")[1],
-                      path: path.join(dir, file),
-                  });
-    });
-
-    return fileArray;
-};
-
-/**
- * Find all files inside a dir, recursively for base branch.
- * @function getLcovBaseFiles
- * @param  {string} dir Dir path string.
- * @return {string[{<package_name>: <path_to_lcov_file>}]} Array with lcove file names with package names as key.
- */
-const getLcovBaseFiles = (dir, filelist) => {
-    let fileArray = filelist || [];
-    fs.readdirSync(dir).forEach((file) => {
-        fileArray = fs.statSync(path.join(dir, file)).isDirectory()
-            ? getLcovBaseFiles(path.join(dir, file), fileArray)
-            : fileArray
-                  .filter((f) => f.path.includes("lcov-base"))
-                  .concat({
-                      name: dir.split("/")[1],
-                      path: path.join(dir, file),
-                  });
-    });
-
-    return fileArray;
-};
-
-const main = async () => {
-    const { context = {} } = github || {};
-
-    const token = core.getInput("github-token");
-    const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info";
-    const baseFile = core.getInput("lcov-base");
-    const appName = core.getInput("app-name");
-    // Add base path for monorepo
-    const monorepoBasePath = core.getInput("monorepo-base-path");
-
-    const raw =
-        !monorepoBasePath &&
-        (await promises
-            .readFile(lcovFile, "utf-8")
-            .catch((err) => console.error(err)));
-    if (!monorepoBasePath && !raw) {
-        console.log(`No coverage report found at '${lcovFile}', exiting...`);
-
-        return;
-    }
-
-    const baseRaw =
-        baseFile &&
-        (await promises
-            .readFile(baseFile, "utf-8")
-            .catch((err) => console.error(err)));
-    if (!monorepoBasePath && baseFile && !baseRaw) {
-        console.log(`No coverage report found at '${baseFile}', ignoring...`);
-    }
-
-    const lcovArray = monorepoBasePath ? getLcovFiles(monorepoBasePath) : [];
-    const lcovBaseArray = monorepoBasePath
-        ? getLcovBaseFiles(monorepoBasePath)
-        : [];
-
-    const lcovArrayForMonorepo = [];
-    const lcovBaseArrayForMonorepo = [];
-    for (const file of lcovArray) {
-        if (file.path.includes(".info")) {
-            const rLcove = await promises.readFile(file.path, "utf8");
-            const data = await parse(rLcove);
-            lcovArrayForMonorepo.push({
-                packageName: file.name,
-                lcov: data,
-            });
+const { context = {} } = github || {};
+const token = core.getInput("github-token");
+const githubClient = github.getOctokit(token);
+const appName = core.getInput("app-name") || "noname";
+const monorepoBasePath = core.getInput("monorepo-base-path") || "./packages";
+const client = {
+    readLCovs: (fileFilter) => {
+        const arr = getLcovArray(monorepoBasePath, fileFilter);
+        return arr.map((x) => ({ ...x, packageName: x.dir.split("/")[1] }));
+    },
+    // Lcov root file
+    lcovFile: core.getInput("lcov-file") || "./coverage/lcov.info",
+    // Lcov base file to compare against
+    baseFile: core.getInput("lcov-base"),
+    upsert: async (title, body) => {
+        const prNumber = context.payload.pull_request.number;
+        const hiddenHeader = `<!-- ${appName}-${title}-code-coverage-assistant -->`;
+        await upsertComment({
+            githubClient,
+            context,
+            prNumber,
+            body,
+            hiddenHeader,
+        });
+    },
+    mkDir: (dirName) => {
+        if (!fs.existsSync(dirName)) {
+            fs.mkdirSync(dirName);
+        } else if (!fs.statSync(dirName).isDirectory()) {
+            throw new Error("badge path is not a directory");
         }
-    }
-
-    for (const file of lcovBaseArray) {
-        if (file.path.includes(".info")) {
-            const rLcovBase = await promises.readFile(file.path, "utf8");
-            const data = await parse(rLcovBase);
-            lcovBaseArrayForMonorepo.push({
-                packageName: file.name,
-                lcov: data,
-            });
-        }
-    }
-
-    const options = {
+    },
+    writeBadge: (fileName, svgStr) => fs.writeFileSync(fileName, svgStr),
+    setFailed: core.setFailed,
+    info: core.info,
+    options: {
+        // Used to generate the comment that is added
         repository: context.payload.repository.full_name,
-        commit: context.payload.pull_request.head.sha,
         prefix: `${process.env.GITHUB_WORKSPACE}/`,
-        head: context.payload.pull_request.head.ref,
-        base: context.payload.pull_request.base.ref,
-        appName,
-    };
-
-    const lcov = !monorepoBasePath && (await parse(raw));
-    const baselcov = baseRaw && (await parse(baseRaw));
-
-    const client = github.getOctokit(token);
-
-    await upsertComment({
-        client,
-        context,
-        prNumber: context.payload.pull_request.number,
-        body: !lcovArrayForMonorepo.length
-            ? diff(lcov, baselcov, options)
-            : diffForMonorepo(
-                  lcovArrayForMonorepo,
-                  lcovBaseArrayForMonorepo,
-                  options,
-              ),
-        hiddenHeader: appName
-            ? `<!-- ${appName}-code-coverage-assistant -->`
-            : `<!-- monorepo-code-coverage-assistant -->`,
-    });
+        pullRequest: context.payload.pull_request,
+        // Render multiple comment lines
+        multipleComment: core.getInput("multiple-comment"),
+        // Maximum number of lines in a comment, used to limit the comment size
+        maxLines: core.getInput("max_lines") || 100,
+        // Minimum coverage, 0 == disable coverage check
+        minCoverage: core.getInput("min_coverage"),
+        // directories to be excluded from coverage check
+        excluded: core.getInput("exclude"),
+        // if true exclude the lcovFile from coverage
+        excludeRoot: core.getInput("exclude_root"),
+        // path to the directory where the badges will be written
+        badgePath: core.getInput("badge_path"),
+        // see https://www.npmjs.com/package/badgen options
+        badgeLabel: core.getInput("badge_label") || "coverage",
+        badgeStyle: core.getInput("badge_style") || "classic",
+    },
 };
-
-main().catch((err) => {
+codeCoverageAssistant(client).catch((err) => {
     console.log(err);
     core.setFailed(err.message);
 });
