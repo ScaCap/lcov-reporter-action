@@ -143,7 +143,14 @@ export const comments = async ({
     };
     // Comments
     if (lcovArray && lcovArray.length > 0) {
-        if (options.multipleComment) {
+        if (options.singleComment) {
+            const body = renderCommentArray(
+                lcovArray,
+                lcovBaseArray,
+                renderOptions,
+            );
+            await upsert("single-comment", body);
+        } else {
             for (const lcovObj of lcovArray) {
                 const baseLcov =
                     lcovBaseArray &&
@@ -158,13 +165,6 @@ export const comments = async ({
                 );
                 await upsert(`m-${lcovObj.packageName}`, body);
             }
-        } else {
-            const body = renderCommentArray(
-                lcovArray,
-                lcovBaseArray,
-                renderOptions,
-            );
-            await upsert("single-comment", body);
         }
     }
     if (rootLcov) {

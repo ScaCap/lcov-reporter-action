@@ -46,7 +46,7 @@ const client = {
         prefix: `${process.env.GITHUB_WORKSPACE}/`,
         pullRequest: context.payload.pull_request,
         // Render multiple comment lines
-        multipleComment: core.getInput("multiple-comment"),
+        singleComment: core.getInput("single-comment"),
         // Maximum number of lines in a comment, used to limit the comment size
         maxLines: core.getInput("max_lines") || 100,
         // Minimum coverage, 0 == disable coverage check

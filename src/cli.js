@@ -27,7 +27,7 @@ const main = async () => {
             badgePath: "./badges",
             appName: "someAppName",
             minCoverage: 80,
-            multipleComment: true,
+            singleComment: false,
         },
     };
     if (fs.statSync(file).isDirectory()) {

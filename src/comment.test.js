@@ -173,7 +173,7 @@ describe("comments", function () {
             rootBaseLcov: undefined,
             lcovArray,
             lcovBaseArray: undefined,
-            options: renderOptions,
+            options: { ...renderOptions, singleComment: true },
             upsert,
         });
         expect(upsert).toBeCalledWith(
@@ -188,7 +188,7 @@ describe("comments", function () {
             rootBaseLcov: undefined,
             lcovArray,
             lcovBaseArray: undefined,
-            options: { ...renderOptions, multipleComment: true },
+            options: renderOptions,
             upsert,
         });
         expect(upsert).toHaveBeenNthCalledWith(
@@ -210,7 +210,7 @@ describe("comments", function () {
             rootBaseLcov: undefined,
             lcovArray,
             lcovBaseArray,
-            options: renderOptions,
+            options: { ...renderOptions, singleComment: true },
             upsert,
         });
         expect(upsert).toBeCalledWith(
@@ -225,7 +225,7 @@ describe("comments", function () {
             rootBaseLcov: undefined,
             lcovArray,
             lcovBaseArray,
-            options: { ...renderOptions, multipleComment: true },
+            options: renderOptions,
             upsert,
         });
         expect(upsert).toHaveBeenNthCalledWith(
